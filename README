@@ -1,0 +1,15 @@
+Ad Mediator for Corona
+
+This is a client side ad mediation module for Ansca Corona.
+It supports inmobi, inneractive, herewead and house ads out of the box and 
+can be extended easily by using a simple plugin framework. 
+
+Features;
+
+   * use many ad networks together
+   * switch to another network when there is no ad coming from current one
+   * use your own banners (houseads)
+   * change network and backfill priorities
+   * use banner animations
+   * change configuration on the server side if you wish
+   * easily extend with new networks using the module plugin system
