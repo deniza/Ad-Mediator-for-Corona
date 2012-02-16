@@ -47,7 +47,7 @@ end
 local function local_configuration()
 
     -- init function takes three arguments; adposition_x, adposition_y and ad_request_delay_in_seconds
-    AdMediator.init(0,0,10)
+    AdMediator.init(0,0,60)
     
     -- optionally, you can use a nice banner slide animation when changing banners
     -- targetx and targety are coordinates used when hiding current banner.
