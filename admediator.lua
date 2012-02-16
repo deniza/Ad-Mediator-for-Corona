@@ -231,7 +231,7 @@ function AdMediator.addNetwork(params)
     networkObject.priority = params.backfillpriority
     networkObject.weight = params.weight
     networkObject.name = params.name
-    networkObject.idx = #networks - 1    
+    networkObject.idx = #networks    
     
     networkObject:init(params.networkParams)
     
