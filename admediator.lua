@@ -27,7 +27,7 @@ local currentAdUrl = nil
 local currentBanner = nil
 local loadingBeacon = false
 local isHidden = false
-local adDisplayGroup = nil
+local adDisplayGroup = display.newGroup()
 local adPosX
 local adPosY
 local animationEnabled = false
@@ -148,7 +148,6 @@ end
 function AdMediator.init(posx,posy,adReqDelay)
 
     adRequestDelay = adReqDelay
-    adDisplayGroup = display.newGroup()
     adDisplayGroup.x = posx
     adDisplayGroup.y = posy
     adDisplayGroup:addEventListener("tap",function() system.openURL(currentAdUrl) return true end)        
