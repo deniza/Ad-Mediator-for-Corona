@@ -178,6 +178,10 @@ function AdMediator.initFromUrl(initUrl)
         
         AdMediator.init(config.x,config.y,config.adDelay)
         
+        if config.xscale and config.yscale then
+            AdMediator.setScale(config.xscale, config.yscale)
+        end
+        
         for _,networkDef in ipairs(config.networks) do
             AdMediator.addNetwork(
                 {
@@ -215,6 +219,10 @@ function AdMediator.useAnimation(targetx,targety,duration)
     animationTargetY = targety
     animationDuration = duration
 
+end
+
+function AdMediator.setScale(scalex,scaley)
+    adDisplayGroup:scale(scalex,scaley)
 end
 
 function AdMediator.addNetwork(params)
