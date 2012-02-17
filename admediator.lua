@@ -183,14 +183,7 @@ function AdMediator.initFromUrl(initUrl)
         end
         
         for _,networkDef in ipairs(config.networks) do
-            AdMediator.addNetwork(
-                {
-                    name=networkDef.name,
-                    weight=networkDef.weight,
-                    backfillpriority=networkDef.backfillpriority,
-                    networkParams=networkDef.networkParams,
-                }
-            )
+            AdMediator.addNetwork( networkDef )
         end
         
         AdMediator.start()
