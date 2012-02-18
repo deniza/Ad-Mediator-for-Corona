@@ -114,6 +114,7 @@ local function local_configuration()
             networkParams = {
                 channelId="YOUR_CHANNEL_ID_FROM_HEREWEAD",
                 zoneId="0",
+                test=true,
             },            
         }
     )
