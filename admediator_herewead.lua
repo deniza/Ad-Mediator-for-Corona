@@ -18,6 +18,7 @@ local socket = require("socket")
 local clientIP = ""
 
 local adServerUrl = "http://ws.herewead.com/BannerOpr/GetBanner.aspx"
+local testMode
 local channelId = nil
 local zoneId = nil
 local deviceId = system.getInfo("deviceID")
@@ -72,6 +73,7 @@ end
 function instance:init(networkParams)
     channelId = networkParams.channelId
     zoneId = networkParams.zoneId
+    testMode = networkParams.test
     print("herewead init:",channelId,zoneId)
 end
 
@@ -82,7 +84,11 @@ function instance:requestAd()
     local body = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
     body = body .. "<Parameters>" 
     body = body .. "<CodeVersion>PHP-20100920</CodeVersion>" 
-    body = body .. "<RequestType>TEST</RequestType>" 
+    if testMode then
+        body = body .. "<RequestType>TEST</RequestType>"
+    else
+        body = body .. "<RequestType>LIVE</RequestType>"
+    end
     body = body .. "<ResponseType>XML</ResponseType>" 
     body = body .. "<ChannelID>"..channelId.."</ChannelID>" 
     body = body .. "<ZoneID>"..zoneId.."</ZoneID>" 
