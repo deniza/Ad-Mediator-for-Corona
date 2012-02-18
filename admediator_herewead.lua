@@ -15,7 +15,7 @@
 local instance = {}
 
 local socket = require("socket")
-local clientIP = socket.dns.toip(socket.dns.gethostname())
+local clientIP = ""
 
 local adServerUrl = "http://ws.herewead.com/BannerOpr/GetBanner.aspx"
 local channelId = nil
@@ -23,6 +23,18 @@ local zoneId = nil
 local deviceId = system.getInfo("deviceID")
 local sessionId = deviceId .. "_" .. os.time()
 local userAgentString = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A405 Safari/7534.48.3"
+
+local function findClientIPAddress()
+
+    local function ipListener(event)
+        if not event.isError and event.response ~= "" then
+            clientIP = event.response
+        end
+    end
+    
+    network.request("http://whatismyip.org","GET",ipListener)
+
+end
 
 local function adRequestListener(event)
 
@@ -91,5 +103,7 @@ function instance:requestAd()
     network.request(adServerUrl,"POST",adRequestListener, params)
     
 end
+
+findClientIPAddress()
 
 return instance
