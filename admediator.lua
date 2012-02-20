@@ -230,6 +230,9 @@ end
 function AdMediator.hide()
     isHidden = true
     adDisplayGroup.isVisible = false
+    if enableWebView then
+        native.cancelWebPopup()
+    end
 end
 
 function AdMediator.useAnimation(targetx,targety,duration)
