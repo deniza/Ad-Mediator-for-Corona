@@ -153,7 +153,7 @@ local function adResponseCallback(event)
             end
             
             local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=webPopupListener }
-            native.showWebPopup( 0, 0, 320, 50, filename.."?"..os.time(), options)
+            native.showWebPopup( adPosX, adPosY, 320, 50, filename.."?"..os.time(), options)
         
         else
                                 
