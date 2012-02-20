@@ -27,6 +27,7 @@ local currentAdUrl = nil
 local currentBanner = nil
 local loadingBeacon = false
 local isHidden = false
+local enableWebView = false
 local adDisplayGroup = display.newGroup()
 local adPosX
 local adPosY
@@ -124,16 +125,41 @@ local function adResponseCallback(event)
     
     if event.available then
         
+        currentImageUrl = event.imageUrl
+        currentAdUrl = event.adUrl
+        
         if event.beacon then
             loadingBeacon = true
         else
             loadingBeacon = false
         end
         
-        currentImageUrl = event.imageUrl
-        currentAdUrl = event.adUrl
+        if enableWebView then
         
-        display.loadRemoteImage(currentImageUrl, "GET", adImageDownloadListener, "admediator_tmp_adimage_"..os.time(), system.TemporaryDirectory)
+            local filename = "webview.html"
+            local path = system.pathForFile( filename, system.TemporaryDirectory )
+            local fhandle = io.open(path,"w")
+			local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
+            local bodyStyle = "<body style=\"margin:0; padding:0;\">"
+            fhandle:write("<html><head>"..meta.."</head>"..bodyStyle.."<a href='"..currentAdUrl.."'><img src='"..currentImageUrl.."'/></a></body></html>")
+            io.close(fhandle)
+            
+            local function webPopupListener( event )            
+                if string.find(event.url, "file://", 1, false) == 1 then
+                    return true
+                else
+                    system.openURL(event.url)
+                end
+            end
+            
+            local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=webPopupListener }
+            native.showWebPopup( 0, 0, 320, 50, filename.."?"..os.time(), options)
+        
+        else
+                                
+            display.loadRemoteImage(currentImageUrl, "GET", adImageDownloadListener, "admediator_tmp_adimage_"..os.time(), system.TemporaryDirectory)
+            
+        end
         
     else
     
@@ -177,6 +203,7 @@ function AdMediator.initFromUrl(initUrl)
         end
         
         AdMediator.init(config.x,config.y,config.adDelay)
+        AdMediator.useWebView(config.useWebView)
         
         if config.xscale and config.yscale then
             AdMediator.setScale(config.xscale, config.yscale)
@@ -216,6 +243,10 @@ end
 
 function AdMediator.setScale(scalex,scaley)
     adDisplayGroup:scale(scalex,scaley)
+end
+
+function AdMediator.useWebView(useFlag)
+    enableWebView = useFlag
 end
 
 function AdMediator.addNetwork(params)
