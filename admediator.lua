@@ -28,6 +28,7 @@ local currentBanner = nil
 local loadingBeacon = false
 local isHidden = false
 local enableWebView = false
+local webPopupVisible = false
 local adDisplayGroup = display.newGroup()
 local adPosX
 local adPosY
@@ -52,7 +53,7 @@ local function fetchNextNetworkBasedOnPriority()
         if not network.failedToLoad then
             currentNetworkIdx = network.idx
             network:requestAd()
-            --print("requesting ad:",network.name)
+            print("requesting ad:",network.name)
             break
         end        
     end
@@ -74,8 +75,43 @@ local function fetchRandomNetwork()
     end
     
     networks[currentNetworkIdx]:requestAd()    
-    --print("requesting ad:",networks[currentNetworkIdx].name)
+    print("requesting ad:",networks[currentNetworkIdx].name)
 
+end
+
+local function displayContentInWebPopup(x,y,width,height,contentHtml)
+        
+    local filename = "webview.html"
+    local path = system.pathForFile( filename, system.TemporaryDirectory )
+    local fhandle = io.open(path,"w")
+    local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
+    local bodyStyle = "<body style=\"margin:0; padding:0;\">"
+    fhandle:write("<html><head>"..meta.."</head>"..bodyStyle..contentHtml.."</body></html>")
+    io.close(fhandle)
+    
+    local function webPopupListener( event )            
+        if string.find(event.url, "file://", 1, false) == 1 then
+            return true
+        else
+            system.openURL(event.url)
+        end
+    end
+    
+    local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=webPopupListener }
+    native.showWebPopup( x, y, width, height, filename.."?"..os.time(), options)
+    
+    webPopupVisible = true
+
+end
+
+local function hideCurrentBannerWithAnimation(onCompleteFunc)
+    transition.to(adDisplayGroup,{time=animationDuration/2,x=animationTargetX,y=animationTargetY,onComplete=function()
+            if currentBanner then
+                currentBanner:removeSelf()
+                currentBanner = nil
+            end
+            onCompleteFunc()
+        end})
 end
 
 local function adImageDownloadListener(event)
@@ -98,14 +134,25 @@ local function adImageDownloadListener(event)
             
         else
         
-            if animationEnabled and currentBanner then
+            if animationEnabled then
                 
-                event.target.isVisible = false
-            
-                transition.to(adDisplayGroup,{time=animationDuration/2,x=animationTargetX,y=animationTargetY,onComplete=function()                    
-                        showNewBanner(event.target)
-                        transition.to(adDisplayGroup,{time=animationDuration/2,x=adPosX,y=adPosY})
-                    end})
+                if currentBanner then
+                
+                    event.target.isVisible = false
+                
+                    hideCurrentBannerWithAnimation(function()
+                            showNewBanner(event.target)
+                            transition.to(adDisplayGroup,{time=animationDuration/2,x=adPosX,y=adPosY})
+                        end)
+                        
+                else
+                    adDisplayGroup.x = animationTargetX
+                    adDisplayGroup.y = animationTargetY
+                    showNewBanner(event.target)
+                    
+                    transition.to(adDisplayGroup,{time=animationDuration/2,x=adPosX,y=adPosY})
+                end
+                
             else                
                 showNewBanner(event.target)
             end
@@ -113,15 +160,17 @@ local function adImageDownloadListener(event)
         
         cleanPreviousLoadFailStatus()
         
-        --print("image loaded")
+        print("image loaded")
     
     else
-        --print("image download error!")
+        print("image download error!")
     end        
     
 end
 
 local function adResponseCallback(event)
+    
+    local webPopupOpened = false
     
     if event.available then
         
@@ -134,36 +183,48 @@ local function adResponseCallback(event)
             loadingBeacon = false
         end
         
-        if enableWebView then
-        
-            local filename = "webview.html"
-            local path = system.pathForFile( filename, system.TemporaryDirectory )
-            local fhandle = io.open(path,"w")
-			local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
-            local bodyStyle = "<body style=\"margin:0; padding:0;\">"
-            fhandle:write("<html><head>"..meta.."</head>"..bodyStyle.."<a href='"..currentAdUrl.."'><img src='"..currentImageUrl.."'/></a></body></html>")
-            io.close(fhandle)
+        if event.htmlContent then
             
-            local function webPopupListener( event )            
-                if string.find(event.url, "file://", 1, false) == 1 then
-                    return true
-                else
-                    system.openURL(event.url)
-                end
+            if animationEnabled and currentBanner then            
+                hideCurrentBannerWithAnimation(function()
+                        displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
+                    end)
+            else
+                displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
             end
             
-            local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=webPopupListener }
-            native.showWebPopup( adPosX, adPosY, 320, 50, filename.."?"..os.time(), options)
-        
         else
-                                
-            display.loadRemoteImage(currentImageUrl, "GET", adImageDownloadListener, "admediator_tmp_adimage_"..os.time(), system.TemporaryDirectory)
+        
+            if enableWebView then
+            
+                local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
+                local bodyStyle = "<body style=\"margin:0; padding:0;\">"
+                local contentHtml = "<html><head>"..meta.."</head>"..bodyStyle.."<a href='"..currentAdUrl.."'><img src='"..currentImageUrl.."'/></a></body></html>"
+                
+                if animationEnabled and currentBanner then        
+                    hideCurrentBannerWithAnimation(function()
+                            displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                        end)
+                else
+                    displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                end
+            
+            else
+                
+                if webPopupVisible then
+                    native.cancelWebPopup()
+                    webPopupVisible = false
+                end
+                
+                display.loadRemoteImage(currentImageUrl, "GET", adImageDownloadListener, "admediator_tmp_adimage_"..os.time(), system.TemporaryDirectory)
+                
+            end
             
         end
         
     else
     
-        --print("network failed:",networks[currentNetworkIdx].name)
+        print("network failed:",networks[currentNetworkIdx].name)
         networks[currentNetworkIdx].failedToLoad = true
         
         fetchNextNetworkBasedOnPriority()
@@ -230,7 +291,7 @@ end
 function AdMediator.hide()
     isHidden = true
     adDisplayGroup.isVisible = false
-    if enableWebView then
+    if webPopupVisible then
         native.cancelWebPopup()
     end
 end
