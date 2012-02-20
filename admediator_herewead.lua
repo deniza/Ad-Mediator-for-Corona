@@ -18,6 +18,7 @@ local socket = require("socket")
 local clientIP = ""
 
 local adServerUrl = "http://ws.herewead.com/BannerOpr/GetBanner.aspx"
+local useXmlResponse = true
 local testMode
 local channelId = nil
 local zoneId = nil
@@ -46,34 +47,43 @@ local function adRequestListener(event)
         available = false
     else
     
-        i,f,imageUrl = string.find(event.response, "<imageSource>(.+)</imageSource>")
-        i,f,adUrl = string.find(event.response, "<clickUrl>(.+)</clickUrl>")
-        local i,f,exists = string.find(event.response, "<exists>(.+)</exists>")
+        if useXmlResponse then
     
-        if imageUrl == nil or adUrl == nil then
-            available = false
-        else
-            --strip CDATA section
-            imageUrl = imageUrl:sub(10,imageUrl:len()-3)
-            adUrl = adUrl:sub(10,adUrl:len()-3)
-            exists = exists:sub(10,exists:len()-3)
-        end
+            i,f,imageUrl = string.find(event.response, "<imageSource>(.+)</imageSource>")
+            i,f,adUrl = string.find(event.response, "<clickUrl>(.+)</clickUrl>")
+            local i,f,exists = string.find(event.response, "<exists>(.+)</exists>")
         
-        local beacon = false
-        if exists == "0" then
-            beacon = true
+            if imageUrl == nil or adUrl == nil then
+                available = false
+            else
+                --strip CDATA section
+                imageUrl = imageUrl:sub(10,imageUrl:len()-3)
+                adUrl = adUrl:sub(10,adUrl:len()-3)
+                exists = exists:sub(10,exists:len()-3)
+            end
+            
+            local beacon = false
+            if exists == "0" then
+                beacon = true
+            end
+            
+            Runtime:dispatchEvent({name="adMediator_adResponse",available=available,imageUrl=imageUrl,adUrl=adUrl,beacon=beacon})
+        
+        else
+        
+            Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=event.response})
+        
         end
         
     end
     
-    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,imageUrl=imageUrl,adUrl=adUrl,beacon=beacon})
-
 end
 
 function instance:init(networkParams)
     channelId = networkParams.channelId
     zoneId = networkParams.zoneId
     testMode = networkParams.test
+    useXmlResponse = not networkParams.useXHTMLBanners
     print("herewead init:",channelId,zoneId)
 end
 
@@ -81,6 +91,11 @@ function instance:requestAd()
     
     local headers = {}    
     
+    local responseType = "XHTML"
+    if useXmlResponse then
+        responseType = "XML"
+    end
+            
     local body = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
     body = body .. "<Parameters>" 
     body = body .. "<CodeVersion>PHP-20100920</CodeVersion>" 
@@ -89,7 +104,7 @@ function instance:requestAd()
     else
         body = body .. "<RequestType>LIVE</RequestType>"
     end
-    body = body .. "<ResponseType>XML</ResponseType>" 
+    body = body .. "<ResponseType>"..responseType.."</ResponseType>"
     body = body .. "<ChannelID>"..channelId.."</ChannelID>" 
     body = body .. "<ZoneID>"..zoneId.."</ZoneID>" 
     body = body .. "<UserIP>"..clientIP.."</UserIP>" 
