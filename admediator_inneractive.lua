@@ -17,6 +17,7 @@ local instance = {}
 local adServerUrl = "http://m2m1.inner-active.com/simpleM2M/clientRequestAd"
 local protocolVersion = "Sm2m-1.5.3"
 local deviceId = system.getInfo("deviceID")
+local userAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local clientId = 0
 local clientKey = ""
 
@@ -57,8 +58,14 @@ end
 
 function instance:requestAd()
     
-    local params = "aid=" .. clientKey .. "&v="..protocolVersion.."&po=642&w=320&h=480&hid="..deviceId.."&cid=" .. clientId .. "&t=" .. os.time()    
-    network.request(adServerUrl.."?"..params,"GET",adRequestListener)
+    local headers = {} 
+    headers["User-Agent"] = userAgent
+    
+    local params = {}
+    params.headers = headers
+    
+    local uriParams = "aid=" .. clientKey .. "&v="..protocolVersion.."&po=642&w=320&h=480&hid="..deviceId.."&cid=" .. clientId .. "&t=" .. os.time()    
+    network.request(adServerUrl.."?"..uriParams,"GET",adRequestListener,params)
     
 end
 
