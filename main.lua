@@ -41,6 +41,10 @@ local function remote_configuration()
     -- Please see included ad configuation file (admediator-init.config) for further configuration parameters
 
     AdMediator.initFromUrl("http://yourserver/admediator-init.config?"..os.time())
+    
+    -- you can set ad position also here. But remember, if you specify x and y parameters in remote configuration file,
+    -- they will override the values below.
+    AdMediator.setPosition(0,0)
 
 end
 
