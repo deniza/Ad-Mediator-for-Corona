@@ -1,8 +1,8 @@
 Ad Mediator for Corona
 
 This is a client side ad mediation module for Ansca Corona.
-It supports inmobi, inneractive, herewead and house ads out of the box and 
-can be extended easily by using a simple plugin framework. 
+It supports admob, inmobi, inneractive, herewead and house ads out
+of the box and can be extended easily by using a simple plugin framework. 
 
 Features;
 
