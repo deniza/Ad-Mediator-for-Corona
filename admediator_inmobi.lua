@@ -19,8 +19,25 @@ local adServerUrl_test = "http://i.w.sandbox.inmobi.com/showad.asm"
 local inmobiTestClientKey = "4028cba631d63df10131e1d4650600cd"
 local clientKey = ""
 local testMode
-local userAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
+local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
+local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+local userAgent
+local inmobiUA_ios = "inmobi_iossdk=3.0.2 (iPhone; iPhone OS 4.2; HW iPhone3,1)"
+local inmobiUA_android = "InMobi_AndroidSDK=1.1 (Specs)"
+local inmobiUA
+local inmobiUAEncoded
 local deviceId = system.getInfo("deviceID")
+
+local function urlencode(str)
+  if (str) then
+    str = string.gsub (str, "\n", "\r\n")
+    str = string.gsub (str, "([^%w ])",
+        function (c) return string.format ("%%%02X", string.byte(c)) end)
+    str = string.gsub (str, " ", "+")
+  end
+  return str	
+end
+
 
 local function adRequestListener(event)
 
@@ -50,6 +67,17 @@ end
 function instance:init(networkParams)
     clientKey = networkParams.clientKey
     testMode = networkParams.test
+
+    if system.getInfo("platformName") == "Android" then
+        userAgent = userAgentAndroid
+        inmobiUA = inmobiUA_android
+    else
+        userAgent = userAgentIOS
+        inmobiUA = inmobiUA_ios
+    end
+    
+    inmobiUAEncoded = urlencode(inmobiUA)
+        
     print("inmobi init:",clientKey)
 end
 
@@ -66,14 +94,14 @@ function instance:requestAd()
     local headers = {} 
     headers["Content-Type"] = "application/x-www-form-urlencoded"
     headers["X-Mkhoj-SiteID"] = activeClientKey
-    headers["User-Agent"] = "inmobi_iossdk=3.0.2 (iPhone; iPhone OS 4.2; HW iPhone3,1)"
+    headers["User-Agent"] = inmobiUA
     headers["X-Inmobi-Phone-Useragent"] = userAgent
     headers["Mk-Banner-Size"] = "9"
     
     local params = {}
     params.headers = headers
     
-    local userAgentEncoded = "inmobi_iossdk%3D3.0.2%20%28iPhone%3B%20iPhone%20OS%204.2%3B%20HW%20iPhone3%2C1%29"
+    local userAgentEncoded = inmobiUAEncoded
     params.body = "mk-siteid=" .. activeClientKey .. "&u-id=" .. deviceId .. "&mk-carrier="..AdMediator.clientIPAddress.."&mk-version=pr-SPEC-ATATA-20090521&h-user-agent="..userAgentEncoded.."&d-localization=en_US&d-netType=wifi&mk-ad-slot=9"
     
     
