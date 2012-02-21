@@ -21,7 +21,7 @@ local channelId = nil
 local zoneId = nil
 local deviceId = system.getInfo("deviceID")
 local sessionId = deviceId .. "_" .. os.time()
-local userAgentString = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A405 Safari/7534.48.3"
+local userAgent = AdMediator.getUserAgentString()
 
 local function adRequestListener(event)
 
@@ -96,7 +96,7 @@ function instance:requestAd()
     body = body .. "<Url><![CDATA[http://he2apps.com]]></Url>" 
     body = body .. "<ReferrerUrl><![CDATA[http://he2apps.com]]></ReferrerUrl>" 
     body = body .. "<SessionID>"..sessionId.."</SessionID>" 
-    body = body .. "<UserAgent><![CDATA["..userAgentString.."]]></UserAgent>" 
+    body = body .. "<UserAgent><![CDATA["..userAgent.."]]></UserAgent>" 
     body = body .. "<Random>"..os.time().."</Random>" 
     body = body .. "<UserID>"..deviceId.."</UserID>" 
     body = body .. "<Headers><![CDATA[".."Client-IP="..AdMediator.clientIPAddress.." |".."]]></Headers>" 

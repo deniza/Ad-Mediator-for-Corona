@@ -19,9 +19,7 @@ local adServerUrl_test = "http://i.w.sandbox.inmobi.com/showad.asm"
 local inmobiTestClientKey = "4028cba631d63df10131e1d4650600cd"
 local clientKey = ""
 local testMode
-local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
-local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
-local userAgent
+local userAgent = AdMediator.getUserAgentString()
 local inmobiUA_ios = "inmobi_iossdk=3.0.2 (iPhone; iPhone OS 4.2; HW iPhone3,1)"
 local inmobiUA_android = "InMobi_AndroidSDK=1.1 (Specs)"
 local inmobiUA
@@ -69,10 +67,8 @@ function instance:init(networkParams)
     testMode = networkParams.test
 
     if system.getInfo("platformName") == "Android" then
-        userAgent = userAgentAndroid
         inmobiUA = inmobiUA_android
     else
-        userAgent = userAgentIOS
         inmobiUA = inmobiUA_ios
     end
     

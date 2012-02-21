@@ -17,9 +17,7 @@ local instance = {}
 local adServerUrl = "http://wv.inner-active.mobi/simpleM2M/clientRequestWVBannerOnly"
 local protocolVersion = "2.0.1-iOS-S-1.0.9"
 local deviceId = system.getInfo("deviceID")
-local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
-local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
-local userAgent
+local userAgent = AdMediator.getUserAgentString()
 local clientId = 0
 local clientKey = ""
 
@@ -47,12 +45,6 @@ end
 
 function instance:init(networkParams)
     clientKey = networkParams.clientKey
-    
-    if system.getInfo("platformName") == "Android" then
-        userAgent = userAgentAndroid
-    else
-        userAgent = userAgentIOS
-    end    
     
     print("inneractive init:",clientKey)
 end

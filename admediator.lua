@@ -39,6 +39,10 @@ local animationTargetX
 local animationTargetY
 local animationDuration
 
+local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
+local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+local userAgentString
+
 local function findClientIPAddress()
 
     local function ipListener(event)
@@ -261,6 +265,12 @@ function AdMediator.init(posx,posy,adReqDelay)
     
     AdMediator.setPosition(posx,posy)
     
+    if system.getInfo("platformName") == "Android" then
+        userAgentString = userAgentAndroid
+    else
+        userAgentString = userAgentIOS
+    end       
+    
     Runtime:addEventListener("adMediator_adResponse",adResponseCallback)
 
 end
@@ -348,6 +358,11 @@ function AdMediator.setPosition(x,y)
     adDisplayGroup.x = adPosX
     adDisplayGroup.y = adPosY    
 end
+
+function AdMediator.getUserAgentString()
+    return userAgentString
+end
+
 
 function AdMediator.addNetwork(params)
 
