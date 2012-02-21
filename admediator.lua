@@ -30,6 +30,7 @@ local loadingBeacon = false
 local isHidden = false
 local enableWebView = false
 local webPopupVisible = false
+local currentWebPopupContent
 local adDisplayGroup = display.newGroup()
 local adPosX
 local adPosY
@@ -115,6 +116,7 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
     native.showWebPopup( x, y, width, height, filename.."?"..os.time(), options)
     
     webPopupVisible = true
+    currentWebPopupContent = contentHtml
 
 end
 
@@ -204,8 +206,10 @@ local function adResponseCallback(event)
                         displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
                     end)
             else
-                displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
+                displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)                
             end
+            
+            networks[currentNetworkIdx].usesWebPopup = true
             
         else
         
@@ -220,8 +224,10 @@ local function adResponseCallback(event)
                             displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
                         end)
                 else
-                    displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                    displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)                    
                 end
+                
+                networks[currentNetworkIdx].usesWebPopup = true
             
             else
                 
@@ -231,6 +237,8 @@ local function adResponseCallback(event)
                 end
                 
                 display.loadRemoteImage(currentImageUrl, "GET", adImageDownloadListener, "admediator_tmp_adimage_"..os.time(), system.TemporaryDirectory)
+                
+                networks[currentNetworkIdx].usesWebPopup = false
                 
             end
             
@@ -300,6 +308,11 @@ function AdMediator.show()
     isHidden = false
     adDisplayGroup.isVisible = true
     adDisplayGroup:toFront()
+    
+    if networks[currentNetworkIdx].usesWebPopup then
+        displayContentInWebPopup(adPosX, adPosY, 320, 50, currentWebPopupContent)
+    end    
+    
 end
 
 function AdMediator.hide()
@@ -307,6 +320,7 @@ function AdMediator.hide()
     adDisplayGroup.isVisible = false
     if webPopupVisible then
         native.cancelWebPopup()
+        webPopupVisible = false
     end
 end
 
