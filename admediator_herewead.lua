@@ -74,7 +74,8 @@ end
 
 function instance:requestAd()
     
-    local headers = {}    
+    local headers = {}
+    headers["User-Agent"] = userAgent
     
     local responseType = "XHTML"
     if useXmlResponse then
