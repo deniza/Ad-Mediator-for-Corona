@@ -61,9 +61,9 @@ function instance:init(networkParams)
     submodel = urlencode(submodel)
     
     if system.getInfo("platformName") == "Android" then
-        userAgent = userAgentIOS
-    else
         userAgent = userAgentAndroid
+    else
+        userAgent = userAgentIOS
     end
     
     print("admob init:",publisherId)
@@ -83,7 +83,7 @@ function instance:requestAd()
         publisherId = admobTestPublisherId
     end    
         
-    requestUri = requestUri .. "/mads/gma?u_audio=1&hl=tr&preqs=1&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime=60&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format=320x50_mb&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip=1&caps=SdkAdmobApiForAds&jsv=3"
+    requestUri = requestUri .. "/mads/gma?u_audio=1&hl=en&preqs=1&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime=60&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format=320x50_mb&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip=1&caps=SdkAdmobApiForAds&jsv=3"
     if testMode then
         requestUri = requestUri .. "&adtest=on"
     end
