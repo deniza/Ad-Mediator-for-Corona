@@ -47,12 +47,14 @@ end
 local function local_configuration()
 
     -- init function takes three arguments; adposition_x, adposition_y and ad_request_delay_in_seconds
+    -- I recommend using a delay value 60 seconds or more.
     AdMediator.init(0,0,60)
     
     -- optionally, you can use a nice banner slide animation when changing banners
     -- targetx and targety are coordinates used when hiding current banner.
     -- You probably set them to offscreen values.
     -- Duration is animation duration in miliseconds.
+    -- note: animation system does not work if you use any of xhtml ad networks
     AdMediator.useAnimation(0,-50,1500)
     
     -- after initializing the module, we should add some ad networks and configure them.
@@ -79,15 +81,15 @@ local function local_configuration()
     -- each of 3 providers, AdMediator will use this last plugin to fetch our house ads.
     
     -- clientKey is you application specific token from inmobi
-    -- if you want to server demo (test) ads, set test parameter to true and use the
-    -- demo token 4028cba631d63df10131e1d4650600cd
+    -- if you want to server demo (test) ads, set test parameter to true     
     AdMediator.addNetwork(
         {
             name="admediator_inmobi",
-            weight=34,
+            weight=25,
             backfillpriority=1,
+            enabled=true,
             networkParams = {
-                clientKey="4028cba631d63df10131e1d4650600cd",
+                clientKey="YOUR_INMOBI_APP_KEY",
                 test=true,
             },
         }
@@ -96,11 +98,27 @@ local function local_configuration()
     AdMediator.addNetwork(
         {
             name="admediator_inneractive",    
-            weight=33,
+            weight=25,
             backfillpriority=2,
+            enabled=true,
             networkParams = {
-                clientKey="YOUR_APPLICATION_TOKEN_FROM_INNERACTIVE",
+                clientKey="YOUR_INNERACTIVE_APP_KEY",
             },            
+        }
+    )
+   
+    -- to receive live ads, put your app's publisherId and disable test mode
+    AdMediator.addNetwork(
+        {
+            name="admediator_admob",
+            weight=25,
+            backfillpriority=3,
+            enabled=true,
+            networkParams = {
+                publisherId="YOU_PUBLISHER_ID_FROM_ADMOB",
+                appIdentifier="com.yourcompany.AdMediatorSampleApp",
+                test=true,
+            },
         }
     )
     
@@ -109,12 +127,14 @@ local function local_configuration()
     AdMediator.addNetwork(
         {
             name="admediator_herewead",
-            weight=33,
-            backfillpriority=3,
+            weight=25,
+            backfillpriority=4,
+            enabled=true,
             networkParams = {
                 channelId="YOUR_CHANNEL_ID_FROM_HEREWEAD",
                 zoneId="0",
                 test=true,
+                useXHTMLBanners=true,
             },            
         }
     )
@@ -124,7 +144,7 @@ local function local_configuration()
         {
             name="admediator_houseads",
             weight=0,
-            backfillpriority=4,
+            backfillpriority=5,
             networkParams = {
                 {image="http://he2apps.com/okey/adsv2/chatkapi.png",target="http://bit.ly/housead_target1"},
                 {image="http://he2apps.com/okey/adsv2/komikreplikler.jpg",target="http://bit.ly/housead_target2"},

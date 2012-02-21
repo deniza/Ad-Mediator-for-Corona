@@ -16,8 +16,10 @@ local instance = {}
 
 local adServerUrl = "http://i.w.inmobi.com/showad.asm"
 local adServerUrl_test = "http://i.w.sandbox.inmobi.com/showad.asm"
+local inmobiTestClientKey = "4028cba631d63df10131e1d4650600cd"
 local clientKey = ""
 local testMode
+local userAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local deviceId = system.getInfo("deviceID")
 
 local function adRequestListener(event)
@@ -52,21 +54,30 @@ function instance:init(networkParams)
 end
 
 function instance:requestAd()
+
+    local adserver = adServerUrl
+    local activeClientKey = clientKey
+    
+    if testMode then
+        adserver = adServerUrl_test
+        activeClientKey = inmobiTestClientKey
+    end
     
     local headers = {} 
     headers["Content-Type"] = "application/x-www-form-urlencoded"
-    headers["X-Mkhoj-SiteID"] = clientKey
+    headers["X-Mkhoj-SiteID"] = activeClientKey
+    headers["User-Agent"] = "inmobi_iossdk=3.0.2 (iPhone; iPhone OS 4.2; HW iPhone3,1)"
+    headers["X-Inmobi-Phone-Useragent"] = userAgent
+    headers["Mk-Banner-Size"] = "9"
     
     local params = {}
     params.headers = headers
-    params.body = "mk-siteid=" .. clientKey .. "&u-id=" .. deviceId .. "&mk-version=pr-SPEC-ATATA-20090521&h-user-agent=InMobi_Specs_iPhoneApp%3D1.0.2%20(iPhone%3B%20iPhone%20OS%203.1.2%3B%20HW%20iPhone2%2C1)&d-localization=en_US&d-netType=wifi&mk-ad-slot=9"
     
-    local server = adServerUrl
-    if testMode then
-        server = adServerUrl_test
-    end
+    local userAgentEncoded = "inmobi_iossdk%3D3.0.2%20%28iPhone%3B%20iPhone%20OS%204.2%3B%20HW%20iPhone3%2C1%29"
+    params.body = "mk-siteid=" .. activeClientKey .. "&u-id=" .. deviceId .. "&mk-carrier="..AdMediator.clientIPAddress.."&mk-version=pr-SPEC-ATATA-20090521&h-user-agent="..userAgentEncoded.."&d-localization=en_US&d-netType=wifi&mk-ad-slot=9"
     
-    network.request(server,"POST",adRequestListener,params)
+    
+    network.request(adserver,"POST",adRequestListener,params)
     
 end
 

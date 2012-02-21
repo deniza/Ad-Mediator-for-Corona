@@ -11,24 +11,34 @@
 -- https://github.com/deniza/Ad-Mediator-for-Corona
 ------------------------------------------------------------
 ------------------------------------------------------------
-local url = require("socket.url")
+--local url = require("socket.url")
 local instance = {}
 
 local adServerUrl = "http://googleads.g.doubleclick.net"
 local admobTestPublisherId = "a14e8f77524dde8"
 local publisherId = ""
 local platform = system.getInfo("model")
-local submodel = url.escape(system.getInfo("architectureInfo"))
+local submodel = system.getInfo("architectureInfo")
 local testMode
 local appIdentifier = "com.yourcompany.yourapp"
 local userAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local deviceId = system.getInfo("deviceID")
 
+local function urlencode(str)
+  if (str) then
+    str = string.gsub (str, "\n", "\r\n")
+    str = string.gsub (str, "([^%w ])",
+        function (c) return string.format ("%%%02X", string.byte(c)) end)
+    str = string.gsub (str, " ", "+")
+  end
+  return str	
+end
+
 local function adRequestListener(event)
 
     local available = true
 
-    if event.isError then        
+    if event.isError then
         available = false
     end
     
@@ -44,6 +54,10 @@ function instance:init(networkParams)
     publisherId = networkParams.publisherId
     testMode = networkParams.test
     appIdentifier = networkParams.appIdentifier or "com.yourcompany.testapp"
+    
+    platform = urlencode(platform)
+    submodel = urlencode(submodel)    
+    
     print("admob init:",publisherId)
 end
 
@@ -60,7 +74,7 @@ function instance:requestAd()
     if testMode then
         publisherId = admobTestPublisherId
     end    
-    
+        
     requestUri = requestUri .. "/mads/gma?u_audio=1&hl=tr&preqs=1&app_name=1.0.iphone.com.he2apps.AdmobTest&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime=60&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format=320x50_mb&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip=1&caps=SdkAdmobApiForAds&jsv=3"
     if testMode then
         requestUri = requestUri .. "&adtest=on"

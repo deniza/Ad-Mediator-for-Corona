@@ -15,6 +15,7 @@
 require("json")
 
 AdMediator = {
+    clientIPAddress = "",
 }
 
 local networks = {}
@@ -37,6 +38,19 @@ local animationTargetX
 local animationTargetY
 local animationDuration
 
+local function findClientIPAddress()
+
+    local function ipListener(event)
+        if not event.isError and event.response ~= "" then
+            AdMediator.clientIPAddress = event.response
+        end
+    end
+    
+    network.request("http://whatismyip.org","GET",ipListener)
+
+end
+
+
 local function cleanPreviousLoadFailStatus()
     for i=1,#networks do
         networks[i].failedToLoad = false
@@ -53,7 +67,7 @@ local function fetchNextNetworkBasedOnPriority()
         if not network.failedToLoad then
             currentNetworkIdx = network.idx
             network:requestAd()
-            print("requesting ad:",network.name)
+            --print("requesting ad:",network.name)
             break
         end        
     end
@@ -75,7 +89,7 @@ local function fetchRandomNetwork()
     end
     
     networks[currentNetworkIdx]:requestAd()    
-    print("requesting ad:",networks[currentNetworkIdx].name)
+    --print("requesting ad:",networks[currentNetworkIdx].name)
 
 end
 
@@ -160,10 +174,10 @@ local function adImageDownloadListener(event)
         
         cleanPreviousLoadFailStatus()
         
-        print("image loaded")
+        --print("image loaded")
     
     else
-        print("image download error!")
+        --print("image download error!")
     end        
     
 end
@@ -224,7 +238,7 @@ local function adResponseCallback(event)
         
     else
     
-        print("network failed:",networks[currentNetworkIdx].name)
+        --print("network failed:",networks[currentNetworkIdx].name)
         networks[currentNetworkIdx].failedToLoad = true
         
         fetchNextNetworkBasedOnPriority()
@@ -367,3 +381,5 @@ function AdMediator.start()
     timer.performWithDelay( adRequestDelay * 1000, fetchRandomNetwork, 0 )
 
 end
+
+findClientIPAddress()

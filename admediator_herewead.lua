@@ -14,9 +14,6 @@
 
 local instance = {}
 
-local socket = require("socket")
-local clientIP = ""
-
 local adServerUrl = "http://ws.herewead.com/BannerOpr/GetBanner.aspx"
 local useXmlResponse = true
 local testMode
@@ -25,18 +22,6 @@ local zoneId = nil
 local deviceId = system.getInfo("deviceID")
 local sessionId = deviceId .. "_" .. os.time()
 local userAgentString = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A405 Safari/7534.48.3"
-
-local function findClientIPAddress()
-
-    local function ipListener(event)
-        if not event.isError and event.response ~= "" then
-            clientIP = event.response
-        end
-    end
-    
-    network.request("http://whatismyip.org","GET",ipListener)
-
-end
 
 local function adRequestListener(event)
 
@@ -107,14 +92,14 @@ function instance:requestAd()
     body = body .. "<ResponseType>"..responseType.."</ResponseType>"
     body = body .. "<ChannelID>"..channelId.."</ChannelID>" 
     body = body .. "<ZoneID>"..zoneId.."</ZoneID>" 
-    body = body .. "<UserIP>"..clientIP.."</UserIP>" 
+    body = body .. "<UserIP>"..AdMediator.clientIPAddress.."</UserIP>" 
     body = body .. "<Url><![CDATA[http://he2apps.com]]></Url>" 
     body = body .. "<ReferrerUrl><![CDATA[http://he2apps.com]]></ReferrerUrl>" 
     body = body .. "<SessionID>"..sessionId.."</SessionID>" 
     body = body .. "<UserAgent><![CDATA["..userAgentString.."]]></UserAgent>" 
     body = body .. "<Random>"..os.time().."</Random>" 
     body = body .. "<UserID>"..deviceId.."</UserID>" 
-    body = body .. "<Headers><![CDATA[".."Client-IP="..clientIP.." |".."]]></Headers>" 
+    body = body .. "<Headers><![CDATA[".."Client-IP="..AdMediator.clientIPAddress.." |".."]]></Headers>" 
     body = body .. "</Parameters>"
     
     local params = {}
@@ -124,7 +109,5 @@ function instance:requestAd()
     network.request(adServerUrl,"POST",adRequestListener, params)
     
 end
-
-findClientIPAddress()
 
 return instance
