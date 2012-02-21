@@ -14,8 +14,8 @@
 
 local instance = {}
 
-local adServerUrl = "http://m2m1.inner-active.com/simpleM2M/clientRequestAd"
-local protocolVersion = "Sm2m-1.5.3"
+local adServerUrl = "http://wv.inner-active.mobi/simpleM2M/clientRequestWVBannerOnly"
+local protocolVersion = "2.0.1-iOS-S-1.0.9"
 local deviceId = system.getInfo("deviceID")
 local userAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local clientId = 0
@@ -24,30 +24,22 @@ local clientKey = ""
 local function adRequestListener(event)
 
     local available = true
-    local i,f,imageUrl,adUrl,statusOK
+    local i,f,statusOK
     
     if event.isError then
         available = false
     else
             
-        i,f,statusOK = string.find(event.response, "(Error=\"OK\")")
-        i,f,imageUrl = string.find(event.response, "<tns:Image>(.+)</tns:Image>")
-        i,f,adUrl = string.find(event.response, "<tns:URL>(.+)</tns:URL>")
-        clientId = event.response:match('Client Id="(.-)"')
+        i,f,statusOK = string.find(event.response, '(<meta name="inneractive.error" content="OK")')
+        clientId = event.response:match('<meta name="inneractive.cid" content="(.-)"')
         
-        if adUrl == nil or imageUrl == nil or statusOK == nil then
+        if statusOK == nil then
             available = false
-        else
-        
-            --replace url encoded &amp; symbols with &
-            imageUrl = imageUrl:gsub("&amp;","&")
-            adUrl = adUrl:gsub("&amp;","&")
-        
         end
         
     end
     
-    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,imageUrl=imageUrl,adUrl=adUrl})
+    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=event.response})
 
 end
 
