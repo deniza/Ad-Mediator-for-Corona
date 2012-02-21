@@ -270,7 +270,8 @@ function AdMediator.initFromUrl(initUrl)
     local function initRequestListener(event)
     
         if event.isError then
-            error("AdMediator error! mediator can not load configuration from url:" .. initUrl)
+            print("AdMediator error! mediator can not load configuration from url:" .. initUrl)
+            return
         end
         
         local config = json.decode(event.response)
