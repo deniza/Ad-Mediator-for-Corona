@@ -257,12 +257,9 @@ end
 function AdMediator.init(posx,posy,adReqDelay)
 
     adRequestDelay = adReqDelay
-    adDisplayGroup.x = posx
-    adDisplayGroup.y = posy
     adDisplayGroup:addEventListener("tap",function() system.openURL(currentAdUrl) return true end)        
     
-    adPosX = posx
-    adPosY = posy
+    AdMediator.setPosition(posx,posy)
     
     Runtime:addEventListener("adMediator_adResponse",adResponseCallback)
 
@@ -284,6 +281,9 @@ function AdMediator.initFromUrl(initUrl)
             animationTargetY = config.animation.targety
             animationDuration = config.animation.duration
         end
+        
+        config.x = config.x or adPosX or 0
+        config.y = config.y or adPosY or 0
         
         AdMediator.init(config.x,config.y,config.adDelay)
         AdMediator.useWebView(config.useWebView)
@@ -339,6 +339,13 @@ end
 
 function AdMediator.useWebView(useFlag)
     enableWebView = useFlag
+end
+
+function AdMediator.setPosition(x,y)
+    adPosX = x
+    adPosY = y
+    adDisplayGroup.x = adPosX
+    adDisplayGroup.y = adPosY    
 end
 
 function AdMediator.addNetwork(params)
