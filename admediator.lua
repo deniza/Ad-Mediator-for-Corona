@@ -39,6 +39,7 @@ local animationEnabled = false
 local animationTargetX
 local animationTargetY
 local animationDuration
+local timerHandle = nil
 
 local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
@@ -82,10 +83,6 @@ end
 
 local function fetchRandomNetwork()
 
-    if isHidden then
-        return
-    end
-    
     local random = math.floor(math.random()*100) + 1
     for i=1,#weightTable do        
         if random >= weightTable[i].min and random <= weightTable[i].max then
@@ -332,6 +329,10 @@ function AdMediator.show()
     if networks[currentNetworkIdx].usesWebPopup then
         displayContentInWebPopup(adPosX, adPosY, 320, 50, currentWebPopupContent)
     end
+
+    if timerHandle then
+        timer.resume(timerHandle)
+    end
     
     return true
     
@@ -348,6 +349,10 @@ function AdMediator.hide()
     if webPopupVisible then
         native.cancelWebPopup()
         webPopupVisible = false
+    end
+    
+    if timerHandle then
+        timer.pause(timerHandle)
     end
     
     return true
@@ -438,7 +443,7 @@ function AdMediator.start()
     end
     
     fetchRandomNetwork()
-    timer.performWithDelay( adRequestDelay * 1000, fetchRandomNetwork, 0 )
+    timerHandle = timer.performWithDelay( adRequestDelay * 1000, fetchRandomNetwork, 0 )
     
     return true
 
