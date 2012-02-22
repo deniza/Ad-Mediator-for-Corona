@@ -23,6 +23,9 @@ local testMode
 local appIdentifier
 local userAgent = AdMediator.getUserAgentString()
 local deviceId = system.getInfo("deviceID")
+local preqs = 0
+local askip = 0
+local ptime = 1
 
 local function urlencode(str)
   if (str) then
@@ -74,8 +77,21 @@ function instance:requestAd()
     if testMode then
         publisherId = admobTestPublisherId
     end    
+     
+    preqs = preqs + 1
+    
+    askip = askip + 1
+    if askip > 4 then
+        askip = 0
+    end
         
-    requestUri = requestUri .. "/mads/gma?u_audio=1&hl=en&preqs=1&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime=60&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format=320x50_mb&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip=1&caps=SdkAdmobApiForAds&jsv=3"
+    local prl_net = ""
+    if preqs > 1 then
+        prl_net = "&prl="..math.random(500,600).."&net=wi"
+        ptime = ptime + AdMediator.adRequestDelay * 1000
+    end
+        
+    requestUri = requestUri .. "/mads/gma?u_audio=1&hl=en&preqs="..preqs.."&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime="..ptime.."&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format=320x50_mb&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip="..askip.."&caps=SdkAdmobApiForAds&jsv=3"..prl_net
     if testMode then
         requestUri = requestUri .. "&adtest=on"
     end
