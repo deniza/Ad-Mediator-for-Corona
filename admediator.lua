@@ -12,7 +12,7 @@
 ------------------------------------------------------------
 ------------------------------------------------------------
 
-require("json")
+local json = require("json")
 
 AdMediator = {
     clientIPAddress = "",
@@ -21,6 +21,7 @@ AdMediator = {
 local networks = {}
 local weightTable = {}
 local networksByPriority = {}
+local initialized = false
 local adRequestDelay = nil
 local currentNetworkIdx = nil
 local currentImageUrl = nil
@@ -272,6 +273,8 @@ function AdMediator.init(posx,posy,adReqDelay)
     end       
     
     Runtime:addEventListener("adMediator_adResponse",adResponseCallback)
+    
+    initialized = true
 
 end
 
@@ -281,6 +284,7 @@ function AdMediator.initFromUrl(initUrl)
     
         if event.isError then
             print("AdMediator error! mediator can not load configuration from url:" .. initUrl)
+            initialized = false
             return
         end
         
@@ -316,23 +320,38 @@ function AdMediator.initFromUrl(initUrl)
 end
 
 function AdMediator.show()
+
+    if not initialized then
+        return false
+    end
+
     isHidden = false
     adDisplayGroup.isVisible = true
     adDisplayGroup:toFront()
     
     if networks[currentNetworkIdx].usesWebPopup then
         displayContentInWebPopup(adPosX, adPosY, 320, 50, currentWebPopupContent)
-    end    
+    end
+    
+    return true
     
 end
 
 function AdMediator.hide()
+
+    if not initialized then
+        return false
+    end
+
     isHidden = true
     adDisplayGroup.isVisible = false
     if webPopupVisible then
         native.cancelWebPopup()
         webPopupVisible = false
     end
+    
+    return true
+    
 end
 
 function AdMediator.useAnimation(targetx,targety,duration)
@@ -387,6 +406,10 @@ end
 
 function AdMediator.start()
 
+    if not initialized then
+        return false
+    end
+
     local totalWeight = 0    
     for _,network in ipairs(networks) do
         networksByPriority[#networksByPriority+1] = network
@@ -416,6 +439,8 @@ function AdMediator.start()
     
     fetchRandomNetwork()
     timer.performWithDelay( adRequestDelay * 1000, fetchRandomNetwork, 0 )
+    
+    return true
 
 end
 
