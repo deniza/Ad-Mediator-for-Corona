@@ -16,12 +16,12 @@ require("json")
 
 AdMediator = {
     clientIPAddress = "",
+    adRequestDelay,
 }
 
 local networks = {}
 local weightTable = {}
 local networksByPriority = {}
-local adRequestDelay = nil
 local currentNetworkIdx = nil
 local currentImageUrl = nil
 local currentAdUrl = nil
@@ -260,7 +260,7 @@ end
 
 function AdMediator.init(posx,posy,adReqDelay)
 
-    adRequestDelay = adReqDelay
+    AdMediator.adRequestDelay = adReqDelay
     adDisplayGroup:addEventListener("tap",function() system.openURL(currentAdUrl) return true end)        
     
     AdMediator.setPosition(posx,posy)
@@ -415,7 +415,7 @@ function AdMediator.start()
     end
     
     fetchRandomNetwork()
-    timer.performWithDelay( adRequestDelay * 1000, fetchRandomNetwork, 0 )
+    timer.performWithDelay( AdMediator.adRequestDelay * 1000, fetchRandomNetwork, 0 )
 
 end
 
