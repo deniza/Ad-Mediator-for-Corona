@@ -383,8 +383,6 @@ function AdMediator.show()
         timer.resume(timerHandle)
     end
     
-    return true
-    
 end
 
 function AdMediator.hide()
@@ -399,8 +397,6 @@ function AdMediator.hide()
     if timerHandle then
         timer.pause(timerHandle)
     end
-    
-    return true
     
 end
 
@@ -486,8 +482,6 @@ function AdMediator.start()
     fetchRandomNetwork()
     timerHandle = timer.performWithDelay( adRequestDelay * 1000, fetchRandomNetwork, 0 )
     
-    return true
-
 end
 
 findClientIPAddress()
