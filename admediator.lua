@@ -43,6 +43,9 @@ local timerHandle = nil
 local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
 local userAgentString
+local PLATFORM_IOS, PLATFORM_ANDROID = 0, 1
+local platform
+local runningOnIPAD
 
 local function findClientIPAddress()
 
@@ -100,7 +103,36 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
     local filename = "webview.html"
     local path = system.pathForFile( filename, system.TemporaryDirectory )
     local fhandle = io.open(path,"w")
+    -- Default for iPhone/iTouch
     local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
+    
+    local newX = x
+    local newY = y
+    local newWidth = 320
+    local newHeight = 50
+    local scale = 1/display.contentScaleY
+ 
+    -- disable any existing viewport meta tag definition
+    contentHtml = string.gsub(contentHtml, '<meta name="viewport"', '<meta name="disabled_viewport"')
+    print(contentHtml)
+
+    if platform == PLATFORM_ANDROID then
+
+        meta = "<meta name=\"viewport\" content=\"width=320; initial-scale=1; minimum-scale=1; maximum-scale=2; user-scalable=0;\"/>"
+        -- Max scale for android is 2 (enforced above just in case), so adjust web popup if over 2. 
+        if scale > 2 then scale = scale/2
+                newWidth = (width/scale) + 1
+                newHeight = (height/scale) + 2
+                newX = x + (width - newWidth)/2
+                newY = y + (height - newHeight)/2
+        end
+            
+    elseif runningOnIPAD then
+        meta = "<meta name=\"viewport\" content=\"width=320; initial-scale=" .. scale .. 
+                                                          "; minimum-scale=" .. scale ..
+                                                          "; maximum-scale=" .. scale .. "; user-scalable=0;\"/>"
+    end
+ 
     local bodyStyle = "<body style=\"margin:0; padding:0;\">"
     fhandle:write("<html><head>"..meta.."</head>"..bodyStyle..contentHtml.."</body></html>")
     io.close(fhandle)
@@ -113,12 +145,12 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
         end
     end
     
-    local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=webPopupListener }
-    native.showWebPopup( x, y, width, height, filename.."?"..os.time(), options)
-    
+    local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=webPopupListener } 
+    native.showWebPopup( newX, newY, newWidth, newHeight, filename.."?"..os.time(), options)
+        
     webPopupVisible = true
     currentWebPopupContent = contentHtml
-
+ 
 end
 
 local function hideCurrentBannerWithAnimation(onCompleteFunc)
@@ -262,11 +294,22 @@ function AdMediator.init(posx,posy,adReqDelay)
     
     AdMediator.setPosition(posx,posy)
     
+    print(system.getInfo("platformName"))
+    print(system.getInfo("model"))
+    
     if system.getInfo("platformName") == "Android" then
         userAgentString = userAgentAndroid
+        platform = PLATFORM_ANDROID
     else
         userAgentString = userAgentIOS
-    end       
+        platform = PLATFORM_IOS
+        
+        if system.getInfo( "model" ) == "iPad" or system.getInfo( "model" ) == "iPad Simulator" then
+            runningOnIPAD = true
+        else
+            runningOnIPAD = false
+        end
+    end
     
     Runtime:addEventListener("adMediator_adResponse",adResponseCallback)
     
