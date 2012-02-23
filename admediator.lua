@@ -21,7 +21,6 @@ AdMediator = {
 local networks = {}
 local weightTable = {}
 local networksByPriority = {}
-local initialized = false
 local adRequestDelay = nil
 local currentNetworkIdx = nil
 local currentImageUrl = nil
@@ -271,17 +270,14 @@ function AdMediator.init(posx,posy,adReqDelay)
     
     Runtime:addEventListener("adMediator_adResponse",adResponseCallback)
     
-    initialized = true
-
 end
 
-function AdMediator.initFromUrl(initUrl)
+function AdMediator.initFromUrl(initUrl, initCallbackFunction)
 
     local function initRequestListener(event)
     
         if event.isError then
-            print("AdMediator error! mediator can not load configuration from url:" .. initUrl)
-            initialized = false
+            initCallbackFunction(false)
             return
         end
         
@@ -308,8 +304,7 @@ function AdMediator.initFromUrl(initUrl)
             AdMediator.addNetwork( networkDef )
         end
         
-        AdMediator.start()
-    
+        initCallbackFunction(true)
     end
     
     network.request(initUrl, "GET", initRequestListener)
@@ -317,10 +312,6 @@ function AdMediator.initFromUrl(initUrl)
 end
 
 function AdMediator.show()
-
-    if not initialized then
-        return false
-    end
 
     isHidden = false
     adDisplayGroup.isVisible = true
@@ -339,10 +330,6 @@ function AdMediator.show()
 end
 
 function AdMediator.hide()
-
-    if not initialized then
-        return false
-    end
 
     isHidden = true
     adDisplayGroup.isVisible = false
@@ -410,10 +397,6 @@ function AdMediator.addNetwork(params)
 end
 
 function AdMediator.start()
-
-    if not initialized then
-        return false
-    end
 
     local totalWeight = 0    
     for _,network in ipairs(networks) do

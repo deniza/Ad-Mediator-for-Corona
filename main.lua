@@ -36,16 +36,23 @@ end
 
 local function remote_configuration()
 
-    -- If you choose to use remote configuration, all you have to do is to call
-    -- AdMediator.initFromUrl(configURL)
+    -- If you choose to use full remote configuration, you have to call;
+    -- AdMediator.initFromUrl(configURL, callbackFunction)
+    -- AdMediator will call your callbackFunction with true if initialization succeeded, and with false
+    -- if something failed (thats probably about missing or broken configuration file)
     -- Please see included ad configuation file (admediator-init.config) for further configuration parameters
+    -- Remember: dont forget to call AdMediator.start() in your callbackFunction() or after receiving a positive callback.
 
-    AdMediator.initFromUrl("http://yourserver/admediator-init.config?"..os.time())
+    local function initCallback(initialized)
+        if initialized then
+            AdMediator.start()
+        else
+            print("ERROR: AdMediator can not initialized properly!")
+        end
+    end
+
+    AdMediator.initFromUrl("http://yourserver/admediator-init.config?"..os.time(), initCallback)
     
-    -- you can set ad position also here. But remember, if you specify x and y parameters in remote configuration file,
-    -- they will override the values below.
-    AdMediator.setPosition(0,0)
-
 end
 
 local function local_configuration()
@@ -79,10 +86,10 @@ local function local_configuration()
     -- networkParams is an ad plugin specific configuration block. If you plan to implement your own network
     -- plugins, you should use this block to get extended parameters.
     
-    -- Below we configure inmobi, inneractive and herewead networks with respective weight values.
+    -- Below we configure inmobi, inneractive, admob and herewead networks with respective weight values.
     -- A final houseads network is configured with a weight of 0 and highest priority value.
     -- That means; this network will never be selected for ad serving, but if there are no ads from
-    -- each of 3 providers, AdMediator will use this last plugin to fetch our house ads.
+    -- each of 4 providers, AdMediator will use this last plugin to fetch our house ads.
     
     -- clientKey is you application specific token from inmobi
     -- if you want to server demo (test) ads, set test parameter to true     
