@@ -32,8 +32,8 @@ local enableWebView = false
 local webPopupVisible = false
 local currentWebPopupContent
 local adDisplayGroup = display.newGroup()
-local adPosX
-local adPosY
+local adPosX = 0
+local adPosY = 0
 local animationEnabled = false
 local animationTargetX
 local animationTargetY
@@ -290,8 +290,8 @@ function AdMediator.initFromUrl(initUrl, initCallbackFunction)
             animationDuration = config.animation.duration
         end
         
-        config.x = config.x or adPosX or 0
-        config.y = config.y or adPosY or 0
+        config.x = config.x or adPosX
+        config.y = config.y or adPosY
         
         AdMediator.init(config.x,config.y,config.adDelay)
         AdMediator.useWebView(config.useWebView)
