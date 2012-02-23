@@ -114,7 +114,6 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
  
     -- disable any existing viewport meta tag definition
     contentHtml = string.gsub(contentHtml, '<meta name="viewport"', '<meta name="disabled_viewport"')
-    print(contentHtml)
 
     if platform == PLATFORM_ANDROID then
 
