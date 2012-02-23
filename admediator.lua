@@ -98,13 +98,32 @@ local function fetchRandomNetwork()
 
 end
 
+local function viewportMetaTagForPlatform()
+
+    -- Default for iPhone/iTouch
+    local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
+    local scale = 1/display.contentScaleY
+ 
+    if platform == PLATFORM_ANDROID then
+    
+        meta = "<meta name=\"viewport\" content=\"width=320; initial-scale=1; minimum-scale=1; maximum-scale=2; user-scalable=0;\"/>"
+        
+    elseif runningOnIPAD then
+        meta = "<meta name=\"viewport\" content=\"width=320; initial-scale=" .. scale .. 
+                                                          "; minimum-scale=" .. scale ..
+                                                          "; maximum-scale=" .. scale .. "; user-scalable=0;\"/>"
+    end
+
+    return meta
+
+end
+
 local function displayContentInWebPopup(x,y,width,height,contentHtml)
         
     local filename = "webview.html"
     local path = system.pathForFile( filename, system.TemporaryDirectory )
     local fhandle = io.open(path,"w")
-    -- Default for iPhone/iTouch
-    local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
+    local meta = viewportMetaTagForPlatform()
     
     local newX = x
     local newY = y
@@ -117,7 +136,6 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
 
     if platform == PLATFORM_ANDROID then
 
-        meta = "<meta name=\"viewport\" content=\"width=320; initial-scale=1; minimum-scale=1; maximum-scale=2; user-scalable=0;\"/>"
         -- Max scale for android is 2 (enforced above just in case), so adjust web popup if over 2. 
         if scale > 2 then scale = scale/2
                 newWidth = (width/scale) + 1
@@ -126,10 +144,6 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
                 newY = y + (height - newHeight)/2
         end
             
-    elseif runningOnIPAD then
-        meta = "<meta name=\"viewport\" content=\"width=320; initial-scale=" .. scale .. 
-                                                          "; minimum-scale=" .. scale ..
-                                                          "; maximum-scale=" .. scale .. "; user-scalable=0;\"/>"
     end
  
     local bodyStyle = "<body style=\"margin:0; padding:0;\">"
@@ -255,7 +269,7 @@ local function adResponseCallback(event)
         
             if enableWebView then
             
-                local meta = "<meta name=\"viewport\" content=\"width=320; user-scalable=0;\"/>"
+                local meta = viewportMetaTagForPlatform()
                 local bodyStyle = "<body style=\"margin:0; padding:0;\">"
                 local contentHtml = "<html><head>"..meta.."</head>"..bodyStyle.."<a href='"..currentAdUrl.."'><img src='"..currentImageUrl.."'/></a></body></html>"
                 
