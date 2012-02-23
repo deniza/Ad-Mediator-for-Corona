@@ -27,7 +27,7 @@ local currentImageUrl = nil
 local currentAdUrl = nil
 local currentBanner = nil
 local loadingBeacon = false
-local isHidden = false
+local isHidden = true
 local enableWebView = false
 local webPopupVisible = false
 local currentWebPopupContent
@@ -384,33 +384,41 @@ function AdMediator.initFromUrl(initUrl, initCallbackFunction)
 end
 
 function AdMediator.show()
-
-    isHidden = false
+    
     adDisplayGroup.isVisible = true
     adDisplayGroup:toFront()
     
-    if networks[currentNetworkIdx].usesWebPopup and currentWebPopupContent then
-        displayContentInWebPopup(adPosX, adPosY, 320, 50, currentWebPopupContent)
+    if isHidden then
+    
+        if networks[currentNetworkIdx].usesWebPopup and currentWebPopupContent then
+            displayContentInWebPopup(adPosX, adPosY, 320, 50, currentWebPopupContent)
+        end
+    
+        if timerHandle then
+            timer.resume(timerHandle)
+        end
+        
     end
-
-    if timerHandle then
-        timer.resume(timerHandle)
-    end
+    
+    isHidden = false
     
 end
 
 function AdMediator.hide()
-
-    isHidden = true
+    
     adDisplayGroup.isVisible = false
     if webPopupVisible then
         native.cancelWebPopup()
         webPopupVisible = false
     end
     
-    if timerHandle then
-        timer.pause(timerHandle)
+    if not isHidden then
+        if timerHandle then
+            timer.pause(timerHandle)
+        end
     end
+    
+    isHidden = true
     
 end
 
@@ -492,6 +500,8 @@ function AdMediator.start()
         
         print("weight",_,network.weight)
     end
+    
+    isHidden = false
     
     fetchRandomNetwork()
     timerHandle = timer.performWithDelay( adRequestDelay * 1000, fetchRandomNetwork, 0 )
