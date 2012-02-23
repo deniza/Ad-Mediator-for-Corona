@@ -235,10 +235,18 @@ local function adResponseCallback(event)
             
             if animationEnabled and currentBanner then            
                 hideCurrentBannerWithAnimation(function()
-                        displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
+                        if not isHidden then
+                            displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
+                        else
+                            currentWebPopupContent = event.htmlContent
+                        end
                     end)
             else
-                displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)                
+                if not isHidden then
+                    displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
+                else
+                    currentWebPopupContent = event.htmlContent
+                end
             end
             
             networks[currentNetworkIdx].usesWebPopup = true
@@ -253,10 +261,18 @@ local function adResponseCallback(event)
                 
                 if animationEnabled and currentBanner then        
                     hideCurrentBannerWithAnimation(function()
-                            displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                            if not isHidden then
+                                displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                            else
+                                currentWebPopupContent = contentHtml
+                            end
                         end)
                 else
-                    displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)                    
+                    if not isHidden then
+                        displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                    else
+                        currentWebPopupContent = event.contentHtml
+                    end
                 end
                 
                 networks[currentNetworkIdx].usesWebPopup = true
@@ -359,7 +375,7 @@ function AdMediator.show()
     adDisplayGroup.isVisible = true
     adDisplayGroup:toFront()
     
-    if networks[currentNetworkIdx].usesWebPopup then
+    if networks[currentNetworkIdx].usesWebPopup and currentWebPopupContent then
         displayContentInWebPopup(adPosX, adPosY, 320, 50, currentWebPopupContent)
     end
 
