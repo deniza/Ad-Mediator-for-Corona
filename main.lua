@@ -17,6 +17,9 @@ require("admediator")
 
 local function initGui()
 
+    local background = display.newRect(0, 0, 320, 480)
+    background:setFillColor(140, 23, 23)
+
     local showButton = widget.newButton{
         label = "show",
         left = 50,
@@ -51,7 +54,7 @@ local function remote_configuration()
         end
     end
 
-    AdMediator.initFromUrl("http://yourserver/admediator-init.config?"..os.time(), initCallback)
+    AdMediator.initFromUrl("http://yourserver/admediator-init.config?"..os.time(), initCallback)    
     
 end
 
@@ -67,6 +70,14 @@ local function local_configuration()
     -- Duration is animation duration in miliseconds.
     -- note: animation system does not work if you use any of xhtml ad networks
     AdMediator.useAnimation(0,-50,1500)
+    
+    -- force system to always use webpopups when displaying ads whether network plugin    
+    -- implementation uses htmlContent or not.
+    AdMediator.useWebView(true)
+    
+    -- 320x50 banners will scale on iPad by default. You can disable this feature by calling this function
+    -- This function should be called before addNetwork(...)
+    AdMediator.enableAutomaticScalingOnIPAD(true)
     
     -- after initializing the module, we should add some ad networks and configure them.
     -- AdMediator comes with inmobi, inneractive, herewead and houseads. You can add
@@ -90,7 +101,7 @@ local function local_configuration()
     -- A final houseads network is configured with a weight of 0 and highest priority value.
     -- That means; this network will never be selected for ad serving, but if there are no ads from
     -- each of 4 providers, AdMediator will use this last plugin to fetch our house ads.
-    
+
     -- clientKey is you application specific token from inmobi
     -- if you want to server demo (test) ads, set test parameter to true     
     AdMediator.addNetwork(
@@ -126,7 +137,7 @@ local function local_configuration()
             backfillpriority=3,
             enabled=true,
             networkParams = {
-                publisherId="YOU_PUBLISHER_ID_FROM_ADMOB",
+                publisherId="YOUR_ADMOB_PUBLISHER_ID",
                 appIdentifier="com.yourcompany.AdMediatorSampleApp",
                 test=true,
             },
