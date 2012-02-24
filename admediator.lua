@@ -295,7 +295,7 @@ local function adResponseCallback(event)
                     if not isHidden then
                         displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
                     else
-                        currentWebPopupContent = event.contentHtml
+                        currentWebPopupContent = contentHtml
                     end
                 end
                 
