@@ -20,6 +20,7 @@ local deviceId = system.getInfo("deviceID")
 local userAgent = AdMediator.getUserAgentString()
 local clientId = 0
 local clientKey = ""
+local metaTag = AdMediator.viewportMetaTagForPlatform()
 
 local function adRequestListener(event)
 
@@ -39,7 +40,11 @@ local function adRequestListener(event)
         
     end
     
-    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=event.response})
+    -- disable input meta tags
+    local htmlContent = string.gsub(event.response,'<meta name="','<meta name="_disabled_')
+    
+    local htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;">' .. htmlContent .. '</body></html>'    
+    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
 
 end
 

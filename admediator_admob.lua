@@ -50,7 +50,13 @@ local function adRequestListener(event)
         available = false
     end
     
-    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=event.response})
+    local metaTag = AdMediator.viewportMetaTagForPlatform()
+    local htmlContent = string.gsub(event.response,'<meta name="viewport" content="(.+)"/>',metaTag)
+    
+    -- in case of a missing viewport meta tag, we insert ours anyway
+    local htmlContent = string.gsub(htmlContent,'<head>','<head>'..metaTag)
+    
+    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
 
 end
 

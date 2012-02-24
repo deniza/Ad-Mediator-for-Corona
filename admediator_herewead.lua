@@ -22,6 +22,7 @@ local zoneId = nil
 local deviceId = system.getInfo("deviceID")
 local sessionId = deviceId .. "_" .. os.time()
 local userAgent = AdMediator.getUserAgentString()
+local metaTag = AdMediator.viewportMetaTagForPlatform()
 
 local function adRequestListener(event)
 
@@ -56,7 +57,8 @@ local function adRequestListener(event)
         
         else
         
-            Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=event.response})
+            local htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;">' .. event.response .. '</body></html>'
+            Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
         
         end
         
