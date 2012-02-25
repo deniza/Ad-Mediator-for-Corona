@@ -196,7 +196,8 @@ local function adImageDownloadListener(event)
             end
             currentBanner = newBanner
             currentBanner.isVisible = true
-            adDisplayGroup:insert(currentBanner)            
+            adDisplayGroup:insert(currentBanner)
+            adDisplayGroup:toFront()
         end
             
         if loadingBeacon then
