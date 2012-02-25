@@ -26,7 +26,6 @@ local currentNetworkIdx = nil
 local currentImageUrl = nil
 local currentAdUrl = nil
 local currentBanner = nil
-local loadingBeacon = false
 local isHidden = true
 local enableWebView = false
 local webPopupVisible = false
@@ -128,7 +127,7 @@ function AdMediator.viewportMetaTagForPlatform()
 end
 
 local function displayContentInWebPopup(x,y,width,height,contentHtml)
-        
+    
     local filename = "webview.html"
     local path = system.pathForFile( filename, system.TemporaryDirectory )
     local fhandle = io.open(path,"w")
@@ -200,35 +199,27 @@ local function adImageDownloadListener(event)
             adDisplayGroup:toFront()
         end
             
-        if loadingBeacon then
-        
-            event.target:removeSelf()
-            loadingBeacon = false
+        if animationEnabled then
             
-        else
-        
-            if animationEnabled then
-                
-                if currentBanner then
-                
-                    event.target.isVisible = false
-                
-                    hideCurrentBannerWithAnimation(function()
-                            showNewBanner(event.target)
-                            transition.to(adDisplayGroup,{time=animationDuration/2,x=adPosX,y=adPosY})
-                        end)
-                        
-                else
-                    adDisplayGroup.x = animationTargetX
-                    adDisplayGroup.y = animationTargetY
-                    showNewBanner(event.target)
+            if currentBanner then
+            
+                event.target.isVisible = false
+            
+                hideCurrentBannerWithAnimation(function()
+                        showNewBanner(event.target)
+                        transition.to(adDisplayGroup,{time=animationDuration/2,x=adPosX,y=adPosY})
+                    end)
                     
-                    transition.to(adDisplayGroup,{time=animationDuration/2,x=adPosX,y=adPosY})
-                end
-                
-            else                
+            else
+                adDisplayGroup.x = animationTargetX
+                adDisplayGroup.y = animationTargetY
                 showNewBanner(event.target)
+                
+                transition.to(adDisplayGroup,{time=animationDuration/2,x=adPosX,y=adPosY})
             end
+            
+        else                
+            showNewBanner(event.target)
         end
         
         cleanPreviousLoadFailStatus()
@@ -249,12 +240,6 @@ local function adResponseCallback(event)
         
         currentImageUrl = event.imageUrl
         currentAdUrl = event.adUrl
-        
-        if event.beacon then
-            loadingBeacon = true
-        else
-            loadingBeacon = false
-        end
         
         if event.htmlContent then
             
