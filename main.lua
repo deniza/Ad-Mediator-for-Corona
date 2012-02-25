@@ -156,7 +156,6 @@ local function local_configuration()
                 channelId="YOUR_CHANNEL_ID_FROM_HEREWEAD",
                 zoneId="0",
                 test=true,
-                useXHTMLBanners=true,
             },            
         }
     )
