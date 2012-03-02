@@ -163,7 +163,11 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
         if string.find(event.url, "file://", 1, false) == 1 then
             return true
         else
-            system.openURL(event.url)
+            timer.performWithDelay(10,function()
+                system.openURL(event.url)
+                native.cancelWebPopup()
+            end)
+            
         end
     end    
     

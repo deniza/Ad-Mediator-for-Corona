@@ -2,7 +2,6 @@ settings =
 {
     iphone = {
         plist = {
-            UIApplicationExitsOnSuspend = true,
             UIHiddenStatusBar= true,
 			UIPrerenderedIcon = true,        
             CFBundleIconFile = "Icon.png",
