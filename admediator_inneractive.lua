@@ -14,25 +14,28 @@
 
 local instance = {}
 
-local adServerUrl = "http://wv.inner-active.mobi/simpleM2M/clientRequestWVBannerOnly"
-local protocolVersion = "2.0.1-iOS-S-1.0.9"
+local adServerUrl = "http://m2m1.inner-active.com/simpleM2M/clientRequestAd"
+local protocolVersion = "Sm2m-1.5.3"
 local deviceId = system.getInfo("deviceID")
 local userAgent = AdMediator.getUserAgentString()
-local clientId = 0
+local clientId = "0"
 local clientKey = ""
 local metaTag = AdMediator.viewportMetaTagForPlatform()
 
 local function adRequestListener(event)
 
     local available = true
-    local i,f,statusOK
+    local i,f,statusOK, imageUrl, adUrl
     
     if event.isError then
         available = false
     else
             
-        i,f,statusOK = string.find(event.response, '(<meta name="inneractive.error" content="OK")')
-        clientId = event.response:match('<meta name="inneractive.cid" content="(.-)"')
+        i,f,statusOK = string.find(event.response, '(<tns:Response Error="OK")')
+        clientId = event.response:match('<tns:Client Id="(.-)"')
+        
+        adUrl =  event.response:match('<tns:URL>(.-)</tns:URL>')
+        imageUrl =  event.response:match('<tns:Image>(.-)</tns:Image>')
         
         if statusOK == nil then
             available = false
@@ -40,12 +43,11 @@ local function adRequestListener(event)
         
     end
     
-    -- disable input meta tags
-    local htmlContent = string.gsub(event.response,'<meta name="','<meta name="_disabled_')
+    local banner = '<a href="'..adUrl..'"><img src="'..imageUrl..'"/></a>'
+    local htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;">' .. banner .. '</body></html>'    
     
-    local htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;">' .. htmlContent .. '</body></html>'    
     Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
-
+    
 end
 
 function instance:init(networkParams)
