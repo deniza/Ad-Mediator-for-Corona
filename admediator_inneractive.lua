@@ -20,6 +20,7 @@ local deviceId = system.getInfo("deviceID")
 local userAgent = AdMediator.getUserAgentString()
 local clientId = "0"
 local clientKey = ""
+local platformId
 local metaTag = AdMediator.viewportMetaTagForPlatform()
 
 local function adRequestListener(event)
@@ -53,6 +54,12 @@ end
 function instance:init(networkParams)
     clientKey = networkParams.clientKey
     
+    if system.getInfo("platformName") == "Android" then
+        platformId = "559"
+    else
+        platformId = "642"
+    end
+    
     print("inneractive init:",clientKey)
 end
 
@@ -64,7 +71,7 @@ function instance:requestAd()
     local params = {}
     params.headers = headers
     
-    local uriParams = "aid=" .. clientKey .. "&v="..protocolVersion.."&po=642&w=320&h=480&hid="..deviceId.."&cid=" .. clientId .. "&t=" .. os.time()    
+    local uriParams = "aid=" .. clientKey .. "&v="..protocolVersion.."&po="..platformId.."&w=320&h=480&hid="..deviceId.."&cid=" .. clientId .. "&t=" .. os.time()
     network.request(adServerUrl.."?"..uriParams,"GET",adRequestListener,params)
     
 end
