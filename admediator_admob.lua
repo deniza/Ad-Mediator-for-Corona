@@ -41,21 +41,20 @@ end
 local function adRequestListener(event)
 
     local available = true
+    local htmlContent = ""
 
-    if event.isError then
+    if event.isError or string.find(event.response, "<html>", 1, false) ~= 1 then
         available = false
-    end
+    else
     
-    if string.find(event.response, "<html>", 1, false) ~= 1 then
-        available = false
-    end
+        -- disable current viewport meta tag if any
+        htmlContent = string.gsub(event.response,'<meta name="viewport','<meta name="viewport_disabled')
         
-    -- disable current viewport meta tag if any
-    local htmlContent = string.gsub(event.response,'<meta name="viewport','<meta name="viewport_disabled')
-    
-    -- insert ours
-    local metaTag = AdMediator.viewportMetaTagForPlatform()
-    local htmlContent = string.gsub(htmlContent,'<head>','<head>'..metaTag)
+        -- insert ours
+        local metaTag = AdMediator.viewportMetaTagForPlatform()
+        htmlContent = string.gsub(htmlContent,'<head>','<head>'..metaTag)
+        
+    end
     
     Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
 

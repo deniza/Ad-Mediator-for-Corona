@@ -27,6 +27,7 @@ local function adRequestListener(event)
 
     local available = true
     local i,f,imageUrl,adUrl
+    local htmlContent = ""
     
     if event.isError then
         available = false
@@ -53,7 +54,10 @@ local function adRequestListener(event)
             
         end
         
-        local htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;"><a href="'..adUrl..'"><img src="'..imageUrl..'"/></a></body></html>'
+        if available then
+            htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;"><a href="'..adUrl..'"><img src="'..imageUrl..'"/></a></body></html>'
+        end
+        
         Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
             
     end
