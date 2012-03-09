@@ -38,6 +38,7 @@ local animationTargetX
 local animationTargetY
 local animationDuration
 local timerHandle = nil
+local paused = false
 
 local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
@@ -168,8 +169,14 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
         end
     end    
     
-    local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=webPopupListener } 
+    local customListener = webPopupListener
+    if networks[currentNetworkIdx].customWebPopupListener ~= nil then
+        customListener = networks[currentNetworkIdx]:customWebPopupListener()
+    end
+    
+    local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=customListener } 
     native.showWebPopup( newX, newY, newWidth, newHeight, filename.."?"..os.time(), options)
+        
         
     webPopupVisible = true
     currentWebPopupContent = contentHtml
@@ -396,6 +403,32 @@ function AdMediator.show()
     
     isHidden = false
     
+end
+
+function AdMediator.pause()
+
+    if paused then
+        return
+    end
+    
+    if timerHandle then     
+        timer.pause(timerHandle)
+        paused = true            
+    end
+
+end
+
+function AdMediator.resume()
+
+    if not paused then
+        return
+    end
+    
+    if timerHandle then     
+        timer.resume(timerHandle)
+        paused = false            
+    end
+
 end
 
 function AdMediator.hide()

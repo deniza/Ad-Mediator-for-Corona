@@ -11,7 +11,7 @@
 -- https://github.com/deniza/Ad-Mediator-for-Corona
 ------------------------------------------------------------
 ------------------------------------------------------------
---local url = require("socket.url")
+local urlmodule = require("socket.url")
 local instance = {}
 
 local adServerUrl = "http://googleads.g.doubleclick.net"
@@ -27,6 +27,12 @@ local preqs = 0
 local askip = 0
 local ptime = 1
 local starttime
+local prevClickUrl
+local prevOpenUrl
+local adFormat = "320x50_mb"
+--local adFormat = "728x90_as"
+--local adFormat = "468x60_as"
+
 
 local function urlencode(str)
   if (str) then
@@ -38,14 +44,103 @@ local function urlencode(str)
   return str	
 end
 
+local function decodeUrlEncodedString(str)
+    return string.gsub(str, "%%(%x%x)", function (h) return string.char(tonumber(h, 16)) end)    
+end
+
+local function parse_query_string(query)
+	local parsed = {}
+	local pos = 0
+
+	query = string.gsub(query, "&amp;", "&")
+	query = string.gsub(query, "&lt;", "<")
+	query = string.gsub(query, "&gt;", ">")
+
+	local function ginsert(qstr)
+		local first, last = string.find(qstr, "=")
+		if first then
+			parsed[string.sub(qstr, 0, first-1)] = string.sub(qstr, first+1)
+		end
+	end
+
+	while true do
+		local first, last = string.find(query, "&", pos)
+		if first then
+			ginsert(string.sub(query, pos, first-1));
+			pos = last+1
+		else
+			ginsert(string.sub(query, pos));
+			break;
+		end
+	end
+	return parsed
+end
+
+local function webPopupListener( event )            
+        
+    if string.find(event.url, "file://",1,true) then        
+        return true
+        
+    elseif string.find(event.url, "gmsg://",1,true) then
+        
+        local parsedUrl = urlmodule.parse(event.url)
+        local params = parse_query_string(parsedUrl.query)            
+        local link = decodeUrlEncodedString(params.u)
+                    
+        if parsedUrl.path == "/click" then
+            
+            if prevClickUrl ~= link then
+                network.request(link,"GET")
+                prevClickUrl = link
+            end
+            
+        elseif parsedUrl.path == "/open" then
+
+            if prevOpenUrl ~= link then
+            
+                timer.performWithDelay(10,function()                
+                    system.openURL(link)
+                    native.cancelWebPopup()
+                end)
+                
+                prevOpenUrl = link
+            end
+            
+        end            
+        
+        return true
+        
+    elseif string.find(event.url, "http://",1,true) or string.find(event.url, "https://",1,true) then
+    
+        local parsedUrl = urlmodule.parse(event.url)
+        if parsedUrl.host == "googleads.g.doubleclick.net" or parsedUrl.host == "www.googleadservices.com" then
+            return true
+        end
+    
+        timer.performWithDelay(10,function()
+           system.openURL(event.url)
+            native.cancelWebPopup()
+        end)
+        return true
+    else
+    
+        print("unknown protocol scheme", event.url)
+        return true
+    
+    end
+end    
+
+
 local function adRequestListener(event)
 
     local available = true
     local htmlContent = ""
 
-    if event.isError or string.find(event.response, "<html>", 1, false) ~= 1 then
+    if event.isError or not string.find(event.response, "<html>", 1, true) then
         available = false
-    else
+    end
+    
+    if available then
     
         -- disable current viewport meta tag if any
         htmlContent = string.gsub(event.response,'<meta name="viewport','<meta name="viewport_disabled')
@@ -71,7 +166,14 @@ function instance:init(networkParams)
     print("admob init:",publisherId)
 end
 
+function instance:customWebPopupListener()
+    return webPopupListener
+end
+
 function instance:requestAd()
+    
+    prevClickUrl = nil
+    prevOpenUrl = nil
     
     local headers = {} 
     headers["User-Agent"] = userAgent
@@ -102,7 +204,7 @@ function instance:requestAd()
         ptime = (now-starttime) * 1000
     end
         
-    requestUri = requestUri .. "/mads/gma?u_audio=1&hl=en&preqs="..preqs.."&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime="..ptime.."&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format=320x50_mb&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip="..askip.."&caps=SdkAdmobApiForAds&jsv=3"..prl_net
+    requestUri = requestUri .. "/mads/gma?u_audio=1&hl=en&preqs="..preqs.."&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime="..ptime.."&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format="..adFormat.."&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip="..askip.."&caps=SdkAdmobApiForAds&jsv=3"..prl_net
     if testMode then
         requestUri = requestUri .. "&adtest=on"
     end
