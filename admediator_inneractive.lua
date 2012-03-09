@@ -38,14 +38,17 @@ local function adRequestListener(event)
         adUrl =  event.response:match('<tns:URL>(.-)</tns:URL>')
         imageUrl =  event.response:match('<tns:Image>(.-)</tns:Image>')
         
-        if statusOK == nil then
+        if statusOK == nil or adUrl == nil or imageUrl == nil then
             available = false
         end
         
     end
     
-    local banner = '<a href="'..adUrl..'"><img src="'..imageUrl..'"/></a>'
-    local htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;">' .. banner .. '</body></html>'    
+    local htmlContent = ""
+    if available then    
+        local banner = '<a href="'..adUrl..'"><img src="'..imageUrl..'"/></a>'
+        htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;">' .. banner .. '</body></html>'
+    end
     
     Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
     
