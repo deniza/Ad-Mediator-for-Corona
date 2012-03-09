@@ -59,13 +59,6 @@ local function findClientIPAddress()
 
 end
 
-
-local function cleanPreviousLoadFailStatus()
-    for i=1,#networks do
-        networks[i].failedToLoad = false
-    end
-end
-
 local function fetchNextNetworkBasedOnPriority()
     
     if isHidden then
@@ -84,6 +77,10 @@ local function fetchNextNetworkBasedOnPriority()
 end
 
 local function fetchRandomNetwork()
+
+    for i=1,#networks do
+        networks[i].failedToLoad = false
+    end
 
     local random = math.floor(math.random()*100) + 1
     for i=1,#weightTable do        
@@ -225,8 +222,6 @@ local function adImageDownloadListener(event)
         else                
             showNewBanner(event.target)
         end
-        
-        cleanPreviousLoadFailStatus()
         
         --print("image loaded")
     
