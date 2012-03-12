@@ -25,6 +25,8 @@ local inmobiUA_android = "InMobi_AndroidSDK=1.1 (Specs)"
 local inmobiUA
 local inmobiUAEncoded
 local deviceId = system.getInfo("deviceID")
+local metaTag = AdMediator.viewportMetaTagForPlatform()
+local slotSize = 9
 
 local function urlencode(str)
   if (str) then
@@ -41,6 +43,7 @@ local function adRequestListener(event)
 
     local available = true
     local i,f,imageUrl,adUrl
+    local htmlContent = ""
 
     if event.isError then
         available = false
@@ -48,17 +51,16 @@ local function adRequestListener(event)
     
         i,f,imageUrl = string.find(event.response, "<ImageURL>(.+)</ImageURL>")
         i,f,adUrl = string.find(event.response, "<AdURL>(.+)</AdURL>")
+
         if adUrl == nil or imageUrl == nil then
             available = false
         else
-            --replace url encoded &amp; symbols with &
-            imageUrl = imageUrl:gsub("&amp;","&")
-            adUrl = adUrl:gsub("&amp;","&")
+            htmlContent = '<html><head>'..metaTag..'</head><body style="margin:0; padding:0;"><a href="'..adUrl..'"><img src="'..imageUrl..'"/></a></body></html>'                        
         end
         
     end
     
-    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,imageUrl=imageUrl,adUrl=adUrl})
+    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,htmlContent=htmlContent})
 
 end
 
@@ -92,13 +94,13 @@ function instance:requestAd()
     headers["X-Mkhoj-SiteID"] = activeClientKey
     headers["User-Agent"] = inmobiUA
     headers["X-Inmobi-Phone-Useragent"] = userAgent
-    headers["Mk-Banner-Size"] = "9"
+    headers["Mk-Banner-Size"] = slotSize
     
     local params = {}
     params.headers = headers
     
     local userAgentEncoded = inmobiUAEncoded
-    params.body = "mk-siteid=" .. activeClientKey .. "&u-id=" .. deviceId .. "&mk-carrier="..AdMediator.clientIPAddress.."&mk-version=pr-SPEC-ATATA-20090521&h-user-agent="..userAgentEncoded.."&d-localization=en_US&d-netType=wifi&mk-ad-slot=9"
+    params.body = "mk-siteid=" .. activeClientKey .. "&u-id=" .. deviceId .. "&mk-carrier="..AdMediator.clientIPAddress.."&mk-version=pr-SPEC-ATATA-20090521&h-user-agent="..userAgentEncoded.."&d-localization=en_US&d-netType=wifi&mk-ad-slot="..slotSize
     
     
     network.request(adserver,"POST",adRequestListener,params)

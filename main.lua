@@ -64,17 +64,6 @@ local function local_configuration()
     -- I recommend using a delay value 60 seconds or more.
     AdMediator.init(0,0,60)
     
-    -- optionally, you can use a nice banner slide animation when changing banners
-    -- targetx and targety are coordinates used when hiding current banner.
-    -- You probably set them to offscreen values.
-    -- Duration is animation duration in miliseconds.
-    -- note: animation system does not work if you use any of xhtml ad networks
-    AdMediator.useAnimation(0,-50,1500)
-    
-    -- force system to always use webpopups when displaying ads whether network plugin    
-    -- implementation uses htmlContent or not.
-    AdMediator.useWebView(true)
-    
     -- 320x50 banners will scale on iPad by default. You can disable this feature by calling this function
     -- This function should be called before addNetwork(...)
     AdMediator.enableAutomaticScalingOnIPAD(true)
