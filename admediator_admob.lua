@@ -29,6 +29,7 @@ local ptime = 1
 local starttime
 local prevClickUrl
 local prevOpenUrl
+local language = "en"
 local adFormat = "320x50_mb"
 --local adFormat = "728x90_as"
 --local adFormat = "468x60_as"
@@ -146,7 +147,7 @@ local function adRequestListener(event)
         htmlContent = string.gsub(event.response,'<meta name="viewport','<meta name="viewport_disabled')
         
         -- insert ours
-        local metaTag = AdMediator.viewportMetaTagForPlatform()
+        local metaTag = AdMediator.viewportMetaTagForPlatform() .. "<meta charset='utf-8'>"
         htmlContent = string.gsub(htmlContent,'<head>','<head>'..metaTag)
         
     end
@@ -204,7 +205,7 @@ function instance:requestAd()
         ptime = (now-starttime) * 1000
     end
         
-    requestUri = requestUri .. "/mads/gma?u_audio=1&hl=en&preqs="..preqs.."&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime="..ptime.."&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format="..adFormat.."&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip="..askip.."&caps=SdkAdmobApiForAds&jsv=3"..prl_net
+    requestUri = requestUri .. "/mads/gma?u_audio=1&hl="..language.."&preqs="..preqs.."&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime="..ptime.."&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format="..adFormat.."&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip="..askip.."&caps=SdkAdmobApiForAds&jsv=3"..prl_net
     if testMode then
         requestUri = requestUri .. "&adtest=on"
     end
