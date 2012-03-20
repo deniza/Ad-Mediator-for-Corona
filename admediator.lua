@@ -108,6 +108,11 @@ function AdMediator.viewportMetaTagForPlatform()
         
     elseif runningOnIPAD then
         
+        if scale > 4 then
+            ---fix scaling issues for 'the new ipad'
+            scale = scale * 0.5
+        end
+        
         local width = 320
         
         if dontScaleOnIPAD then
