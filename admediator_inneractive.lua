@@ -35,6 +35,10 @@ local function adRequestListener(event)
         i,f,statusOK = string.find(event.response, '(<tns:Response Error="OK")')
         clientId = event.response:match('<tns:Client Id="(.-)"')
         
+        if clientId == nil then
+            clientId = "0"
+        end
+        
         adUrl =  event.response:match('<tns:URL>(.-)</tns:URL>')
         imageUrl =  event.response:match('<tns:Image>(.-)</tns:Image>')
         
