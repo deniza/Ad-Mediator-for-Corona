@@ -56,7 +56,9 @@ local function findClientIPAddress()
         end
     end
     
-    network.request("http://whatismyip.org","GET",ipListener)
+    -- whatismyip.org is not working anymore!
+    -- you should use your own ip provider. ie: http://yourserver.com/getip.php
+    -- network.request("http://whatismyip.org","GET",ipListener)
 
 end
 
