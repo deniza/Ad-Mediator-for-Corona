@@ -100,7 +100,7 @@ function instance:requestAd()
     params.headers = headers
     
     local userAgentEncoded = inmobiUAEncoded
-    params.body = "mk-siteid=" .. activeClientKey .. "&u-id=" .. deviceId .. "&mk-carrier="..AdMediator.clientIPAddress.."&mk-version=pr-SPEC-ATATA-20090521&h-user-agent="..userAgentEncoded.."&d-localization=en_US&d-netType=wifi&mk-ad-slot="..slotSize
+    params.body = "mk-siteid=" .. activeClientKey .. "&u-id=" .. deviceId .. "&mk-carrier=&mk-version=pr-SPEC-ATATA-20090521&h-user-agent="..userAgentEncoded.."&d-localization=en_US&d-netType=wifi&mk-ad-slot="..slotSize
     
     
     network.request(adserver,"POST",adRequestListener,params)

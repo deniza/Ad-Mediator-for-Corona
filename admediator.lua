@@ -56,6 +56,9 @@ local function findClientIPAddress()
         end
     end
     
+    -- clientIPAddress is ONLY required for herewead network!
+    -- if you are not using herewead, you dont need to specify your own ip provider script.
+    
     -- whatismyip.org is not working anymore!
     -- you should use your own ip provider. ie: http://yourserver.com/getip.php
     -- network.request("http://whatismyip.org","GET",ipListener)
