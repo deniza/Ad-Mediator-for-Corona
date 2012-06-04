@@ -32,7 +32,8 @@ local function adRequestListener(event)
         available = false
     else
             
-        i,f,statusOK = string.find(event.response, '(<tns:Response Error="OK")')
+        i,f,statusOK = string.find(response, '<tns:Response.*Error="(OK)".*>') 
+        if not i then i,f,statusOK = string.find(response, '<tns:Response.*Error="(House Ad)".*>') end
         clientId = event.response:match('<tns:Client Id="(.-)"')
         
         if clientId == nil then
