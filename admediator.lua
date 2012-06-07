@@ -357,7 +357,7 @@ function AdMediator.initFromUrl(initUrl, initCallbackFunction)
 
     local function initRequestListener(event)
     
-        if event.isError or event.status ~= 200 then
+        if event.isError then
             initCallbackFunction(false)
             return
         end
