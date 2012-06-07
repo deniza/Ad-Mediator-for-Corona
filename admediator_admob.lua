@@ -111,7 +111,7 @@ local function webPopupListener( event )
         
         return true
         
-    elseif string.find(event.url, "http://",1,true) or string.find(event.url, "https://",1,true) then
+    elseif string.find(event.url, "http://",1,true) or string.find(event.url, "https://",1,true) or string.find(event.url, "tel:",1,true) or string.find(event.url, "mailto:",1,true) then
     
         local parsedUrl = urlmodule.parse(event.url)
         if parsedUrl.host == "googleads.g.doubleclick.net" or parsedUrl.host == "www.googleadservices.com" then
