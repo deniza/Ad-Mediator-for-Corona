@@ -16,6 +16,8 @@ local json = require("json")
 
 AdMediator = {
     clientIPAddress = "",
+    PLATFORM_IOS = 0,
+    PLATFORM_ANDROID = 1,
 }
 
 local networks = {}
@@ -43,7 +45,7 @@ local paused = false
 local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
 local userAgentString
-local PLATFORM_IOS, PLATFORM_ANDROID = 0, 1
+local PLATFORM_IOS, PLATFORM_ANDROID = AdMediator.PLATFORM_IOS, AdMediator.PLATFORM_ANDROID
 local platform
 local runningOnIPAD
 local dontScaleOnIPAD = false
@@ -132,6 +134,10 @@ function AdMediator.viewportMetaTagForPlatform()
 
     return meta
 
+end
+
+function AdMediator.getPlatform()
+    return platform
 end
 
 local function displayContentInWebPopup(x,y,width,height,contentHtml)

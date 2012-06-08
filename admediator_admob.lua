@@ -19,6 +19,7 @@ local admobTestPublisherId = "a14e8f77524dde8"
 local publisherId = ""
 local platform = system.getInfo("model")
 local submodel = system.getInfo("architectureInfo")
+local deviceType = AdMediator.getPlatform()
 local testMode
 local appIdentifier
 local userAgent = AdMediator.getUserAgentString()
@@ -29,6 +30,7 @@ local ptime = 1
 local starttime
 local prevClickUrl
 local prevOpenUrl
+local jsVersion = "afma-sdk-i-v5.0.5"
 local language = "en"
 local adFormat = "320x50_mb"
 --local adFormat = "728x90_as"
@@ -164,6 +166,10 @@ function instance:init(networkParams)
     platform = urlencode(platform)
     submodel = urlencode(submodel)
     
+    if deviceType == AdMediator.PLATFORM_ANDROID then
+        jsVersion = "afma-sdk-a-v4.3.1"
+    end
+    
     print("admob init:",publisherId)
 end
 
@@ -204,8 +210,8 @@ function instance:requestAd()
         prl_net = "&prl="..math.random(500,600).."&net=wi"
         ptime = (now-starttime) * 1000
     end
-        
-    requestUri = requestUri .. "/mads/gma?u_audio=1&hl="..language.."&preqs="..preqs.."&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime="..ptime.."&js=afma-sdk-i-v5.0.5&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format="..adFormat.."&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip="..askip.."&caps=SdkAdmobApiForAds&jsv=3"..prl_net
+            
+    requestUri = requestUri .. "/mads/gma?u_audio=1&hl="..language.."&preqs="..preqs.."&app_name="..appIdentifier.."&u_h=480&cap_bs=1&u_so=p&u_w=320&ptime="..ptime.."&js="..jsVersion.."&slotname="..publisherId.."&platform="..platform.."&submodel="..submodel.."&u_sd=2&format="..adFormat.."&output=html&region=mobile_app&u_tz=-120&ex=1&client_sdk=1&askip="..askip.."&caps=SdkAdmobApiForAds&jsv=3"..prl_net
     if testMode then
         requestUri = requestUri .. "&adtest=on"
     end
