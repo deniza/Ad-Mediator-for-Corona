@@ -190,6 +190,12 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
         customListener = networks[currentNetworkIdx]:customWebPopupListener()
     end
     
+    -- fix scaling issues for ipad 3rd generation
+    if 1/display.contentScaleY > 4 then
+        newWidth = newWidth * 2
+        newHeight = newHeight * 2
+    end
+    
     local options = { hasBackground=false, baseUrl=system.TemporaryDirectory, urlRequest=customListener } 
     native.showWebPopup( newX, newY, newWidth, newHeight, filename.."?"..os.time(), options)
         
