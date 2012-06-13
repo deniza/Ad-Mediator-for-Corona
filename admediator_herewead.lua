@@ -18,8 +18,8 @@ local adServerUrl = "http://ws.herewead.com/BannerOpr/GetBanner.aspx"
 local testMode
 local channelId = nil
 local zoneId = nil
-local deviceId = system.getInfo("deviceID")
-local sessionId = deviceId .. "_" .. os.time()
+local deviceId = ""  --not used anymore
+local sessionId = math.random(1000000) .. "_" .. os.time()
 local userAgent = AdMediator.getUserAgentString()
 local metaTag = AdMediator.viewportMetaTagForPlatform()
 

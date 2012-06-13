@@ -16,7 +16,7 @@ local instance = {}
 
 local adServerUrl = "http://m2m1.inner-active.com/simpleM2M/clientRequestAd"
 local protocolVersion = "Sm2m-1.5.3"
-local deviceId = system.getInfo("deviceID")
+local deviceId = ""     --not used anymore
 local userAgent = AdMediator.getUserAgentString()
 local clientId = "0"
 local clientKey = ""

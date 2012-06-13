@@ -24,7 +24,7 @@ local inmobiUA_ios = "inmobi_iossdk=3.0.2 (iPhone; iPhone OS 4.2; HW iPhone3,1)"
 local inmobiUA_android = "InMobi_AndroidSDK=1.1 (Specs)"
 local inmobiUA
 local inmobiUAEncoded
-local deviceId = system.getInfo("deviceID")
+local deviceId = ""   --not used anymore
 local metaTag = AdMediator.viewportMetaTagForPlatform()
 local slotSize = 9
 

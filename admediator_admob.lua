@@ -23,7 +23,6 @@ local deviceType = AdMediator.getPlatform()
 local testMode
 local appIdentifier
 local userAgent = AdMediator.getUserAgentString()
-local deviceId = system.getInfo("deviceID")
 local preqs = 0
 local askip = 0
 local ptime = 1
