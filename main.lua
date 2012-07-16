@@ -96,7 +96,7 @@ local function local_configuration()
     AdMediator.addNetwork(
         {
             name="admediator_inmobi",
-            weight=25,
+            weight=20,
             backfillpriority=1,
             enabled=true,
             networkParams = {
@@ -106,10 +106,11 @@ local function local_configuration()
         }
     )
     
+    -- to receive LIVE inneractive ads, set clientKey to your inneractive app key
     AdMediator.addNetwork(
         {
             name="admediator_inneractive",    
-            weight=25,
+            weight=20,
             backfillpriority=2,
             enabled=true,
             networkParams = {
@@ -122,7 +123,7 @@ local function local_configuration()
     AdMediator.addNetwork(
         {
             name="admediator_admob",
-            weight=25,
+            weight=20,
             backfillpriority=3,
             enabled=true,
             networkParams = {
@@ -133,13 +134,28 @@ local function local_configuration()
         }
     )
     
+
+    -- to receive LIVE ads, set clientToken to your madversite app token and disable test mode
+    AdMediator.addNetwork(
+        {
+            name="admediator_madvertise",
+            weight=20,
+            backfillpriority=4,
+            enabled=true,
+            networkParams = {
+                clientToken="YOUR_MADVERTISE_TOKEN",
+                test=true,
+            },
+        }
+    )
+
     -- herewead network uses additional channelId and zoneId parameters.
     -- You should get them from herewead after registiring your application.
     AdMediator.addNetwork(
         {
             name="admediator_herewead",
-            weight=25,
-            backfillpriority=4,
+            weight=20,
+            backfillpriority=5,
             enabled=true,
             networkParams = {
                 channelId="YOUR_CHANNEL_ID_FROM_HEREWEAD",
@@ -154,7 +170,7 @@ local function local_configuration()
         {
             name="admediator_houseads",
             weight=0,
-            backfillpriority=5,
+            backfillpriority=6,
             networkParams = {
                 {image="http://he2apps.com/okey/adsv2/chatkapi.png",target="http://bit.ly/housead_target1"},
                 {image="http://he2apps.com/okey/adsv2/komikreplikler.jpg",target="http://bit.ly/housead_target2"},
