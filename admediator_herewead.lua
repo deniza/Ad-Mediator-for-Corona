@@ -11,6 +11,7 @@
 -- https://github.com/deniza/Ad-Mediator-for-Corona
 ------------------------------------------------------------
 ------------------------------------------------------------
+require("crypto")
 local url = require("socket.url")
 local instance = {}
 
@@ -19,9 +20,17 @@ local testMode
 local channelId = nil
 local zoneId = nil
 local deviceId = ""  --not used anymore
-local sessionId = math.random(1000000) .. "_" .. os.time()
 local userAgent = AdMediator.getUserAgentString()
 local metaTag = AdMediator.viewportMetaTagForPlatform()
+
+local localClientIdentifier = ourPlayerName
+-- sadece eski sunucu versiyonuna baglanildiginda bu durum olusabilir. daha sonraki release lerde kaldirilabilir.
+if not localClientIdentifier then
+    localClientIdentifier = math.random(1000000)
+end
+
+local clientId = crypto.hmac( crypto.md5, "okey", localClientIdentifier )
+local sessionId = clientId .. "_" .. math.random(1000000)
 
 local function adRequestListener(event)
 
@@ -93,7 +102,7 @@ function instance:requestAd()
     body = body .. "<SessionID>"..sessionId.."</SessionID>" 
     body = body .. "<UserAgent><![CDATA["..userAgent.."]]></UserAgent>" 
     body = body .. "<Random>"..os.time().."</Random>" 
-    body = body .. "<UserID>"..deviceId.."</UserID>" 
+    body = body .. "<UserID>"..clientId.."</UserID>" 
     body = body .. "<Headers><![CDATA[".."Client-IP="..AdMediator.clientIPAddress.." |".."]]></Headers>" 
     body = body .. "</Parameters>"
     
