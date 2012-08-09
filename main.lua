@@ -74,7 +74,6 @@ local function local_configuration()
     
     -- There are 4 parameters common for all networks; name, weight, enabled and backfillpriority
     -- name should be the file name of the ad network plugin script file without lua extension
-    -- It can be one of "admediator_inmobi", "admediator_inneractive" or "admediator_houseads"
     -- weight denotes network selection priority as fill percentage. It can be betwwen 0 and 100.
     -- The rule is; all network weight values shoud sum up to 100. A network with weight equals to zero
     -- will never be selected for ad serving. If you have 2 networks, and you give first network a weight
@@ -86,7 +85,7 @@ local function local_configuration()
     -- networkParams is an ad plugin specific configuration block. If you plan to implement your own network
     -- plugins, you should use this block to get extended parameters.
     
-    -- Below we configure inmobi, inneractive, admob and herewead networks with respective weight values.
+    -- Below we configure inmobi, inneractive, admob, tapit and herewead networks with respective weight values.
     -- A final houseads network is configured with a weight of 0 and highest priority value.
     -- That means; this network will never be selected for ad serving, but if there are no ads from
     -- each of 4 providers, AdMediator will use this last plugin to fetch our house ads.
