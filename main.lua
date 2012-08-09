@@ -135,16 +135,20 @@ local function local_configuration()
     )
     
 
-    -- to receive LIVE ads, set clientToken to your madversite app token and disable test mode
-    AdMediator.addNetwork(
+    -- to receive LIVE ads, set zoneId to your tapit zoneId and disable test mode
+    -- set enableAlertAds to receive alert ads (by calling tapit:requestAlertAds())
+    -- set swapButtons=true to swap alert ads confirmation buttons.
+    local tapit = AdMediator.addNetwork(
         {
-            name="admediator_madvertise",
+            name="admediator_tapit",
             weight=20,
-            backfillpriority=4,
+            backfillpriority=5,
             enabled=true,
             networkParams = {
-                clientToken="YOUR_MADVERTISE_TOKEN",
+                zoneId="7527",
                 test=true,
+                enableAlertAds=false,
+                swapButtons=false,
             },
         }
     )
@@ -155,8 +159,8 @@ local function local_configuration()
         {
             name="admediator_herewead",
             weight=20,
-            backfillpriority=5,
-            enabled=true,
+            backfillpriority=6,
+            enabled=false,
             networkParams = {
                 channelId="YOUR_CHANNEL_ID_FROM_HEREWEAD",
                 zoneId="0",
@@ -170,7 +174,7 @@ local function local_configuration()
         {
             name="admediator_houseads",
             weight=0,
-            backfillpriority=6,
+            backfillpriority=7,
             networkParams = {
                 {image="http://he2apps.com/okey/adsv2/chatkapi.png",target="http://bit.ly/housead_target1"},
                 {image="http://he2apps.com/okey/adsv2/komikreplikler.jpg",target="http://bit.ly/housead_target2"},
