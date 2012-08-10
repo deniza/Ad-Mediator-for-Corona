@@ -88,7 +88,7 @@ local function local_configuration()
     -- Below we configure inmobi, inneractive, admob, tapit and herewead networks with respective weight values.
     -- A final houseads network is configured with a weight of 0 and highest priority value.
     -- That means; this network will never be selected for ad serving, but if there are no ads from
-    -- each of 4 providers, AdMediator will use this last plugin to fetch our house ads.
+    -- each of 4 providers, AdMediator will use this last plugin to fetch our house ads.  
 
     -- clientKey is you application specific token from inmobi
     -- if you want to server demo (test) ads, set test parameter to true     
@@ -178,6 +178,30 @@ local function local_configuration()
             },            
         }
     )
+
+    -- you can use this simple plugin to send custom parameters to your own server side scripts and
+    -- show returning html content. This plugin can be used for many useful things. You can implement
+    -- new ad networks (by usign server-side apis) or use javascript driven interactive houseads, etc.
+    --[[
+    AdMediator.addNetwork(
+        {
+            name="admediator_customHtml",
+            weight=100,
+            backfillpriority=1,
+            enabled=true,
+            networkParams = {
+                requestType="GET",
+                requestUrl = "http://he2apps.com/test/customHtmlTest.php",
+                rawResponse=false,
+                requestParams={
+                    someNumber=123850,
+                    someText="a simple text message",
+                    someOtherTextParameter="whatever you send"
+                }
+            },
+        }
+    )
+    ]]--
     
     -- finally, start serving ads
     AdMediator.start()       
