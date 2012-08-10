@@ -152,19 +152,16 @@ local function local_configuration()
         }
     )
 
-    -- herewead network uses additional channelId and zoneId parameters.
-    -- You should get them from herewead after registiring your application.
     AdMediator.addNetwork(
         {
-            name="admediator_herewead",
+            name="admediator_madvertise",
             weight=20,
             backfillpriority=6,
-            enabled=false,
+            enabled=true,
             networkParams = {
-                channelId="YOUR_CHANNEL_ID_FROM_HEREWEAD",
-                zoneId="0",
+                clientToken="your_client_token_from_madvertise",
                 test=true,
-            },            
+            },
         }
     )
     
