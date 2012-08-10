@@ -25,6 +25,7 @@ local adMediatorStarted = false
 local testMode = false
 local zoneId = 7527
 
+-- utility function to create a text line in a specific displayGroup
 local function createNewLineText(displayGroup, message,x,y)
 
     local line = display.newRetinaText( message, 0, 0, native.systemFontBold, 18*2 )
@@ -38,6 +39,7 @@ local function createNewLineText(displayGroup, message,x,y)
 
 end
 
+-- utility function to create a caption text line in a specific displayGroup
 local function createCaption(displayGroup, message, x, y)
 
     local cap = display.newRetinaText( message, 0, 0, native.systemFontBold, 24*2 )
@@ -49,9 +51,15 @@ local function createCaption(displayGroup, message, x, y)
 
 end
 
+-- this function initializes and starts Ad Mediator.
+-- 2 networks added by default; tapit as the main ad network and a sample house ads banner for
+-- filling unfilled ad inventory
 local function startAdMediator()
 
+    -- ads will be positioned at 0,0 and requested with a interval of 60 seconds.
     AdMediator.init(0,0,60)    
+    
+    -- do not scale ads on high resolution devices
     AdMediator.enableAutomaticScalingOnIPAD(false)
 
     zoneId = zoneIdInput.text
@@ -60,16 +68,15 @@ local function startAdMediator()
         testMode = true
     end
 
+    -- we are going to use tapitNetwork object to call alert ads function,
+    -- so we save it here
     tapitNetwork = AdMediator.addNetwork(
         {
             name="admediator_tapit",
             weight=100,
-            backfillpriority=5,
+            backfillpriority=1,
             enabled=true,
             networkParams = {
-                --zoneId="7527",
-                --zoneId="5716",
-                --zoneId = "3644",
                 zoneId = zoneId,
                 test=testMode,
                 swapButtons = false,
@@ -82,7 +89,7 @@ local function startAdMediator()
         {
             name="admediator_houseads",
             weight=0,
-            backfillpriority=7,
+            backfillpriority=2,
             networkParams = {
                 {image="http://he2apps.com/okey/noads.png",target="http://google.com"},
             },            
@@ -94,6 +101,7 @@ local function startAdMediator()
 
 end
 
+-- this function creates gui for our applicaton
 local function initGui()
 
     local background = display.newRect(0, 0, 320, 480)
@@ -108,10 +116,8 @@ local function initGui()
             
             native.setKeyboardFocus(nil)
 
-            if requestAdButton.disabled then
-                
+            if requestAdButton.disabled then                
                 alertLabel.text = "restart application to modify parameters"
-
                 return
             end
 
@@ -174,4 +180,3 @@ end
 display.setStatusBar( display.HiddenStatusBar )
 
 initGui()
-
