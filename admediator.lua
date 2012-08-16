@@ -41,6 +41,8 @@ local animationTargetY
 local animationDuration
 local timerHandle = nil
 local paused = false
+local bannerWidth = 320
+local bannerHeight = 50
 
 local userAgentIOS = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2 like Mac OS X; en) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8F190 Safari/6533.18.5"
 local userAgentAndroid = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
@@ -140,7 +142,7 @@ function AdMediator.getPlatform()
     return platform
 end
 
-local function displayContentInWebPopup(x,y,width,height,contentHtml)
+local function displayContentInWebPopup(x,y,contentHtml)
     
     local filename = "webview.html"
     local path = system.pathForFile( filename, system.TemporaryDirectory )
@@ -148,8 +150,8 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
     
     local newX = x
     local newY = y
-    local newWidth = 320
-    local newHeight = 50
+    local newWidth = bannerWidth
+    local newHeight = bannerHeight
     local scale = 1/display.contentScaleY
     
     if runningOnIPAD and dontScaleOnIPAD then
@@ -162,10 +164,10 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
         -- Max scale for android is 2 (enforced above just in case), so adjust web popup if over 2. 
         if scale > 2 then
             scale = scale/2
-            newWidth = (width/scale) + 1
-            newHeight = (height/scale) + 2
-            newX = x + (width - newWidth)/2
-            newY = y + (height - newHeight)/2
+            newWidth = (bannerWidth/scale) + 1
+            newHeight = (bannerHeight/scale) + 2
+            newX = x + (bannerWidth - newWidth)/2
+            newY = y + (bannerHeight - newHeight)/2
         end
             
     end
@@ -275,14 +277,14 @@ local function adResponseCallback(event)
             if animationEnabled and currentBanner then            
                 hideCurrentBannerWithAnimation(function()
                         if not isHidden then
-                            displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
+                            displayContentInWebPopup(adPosX, adPosY, event.htmlContent)
                         else
                             currentWebPopupContent = event.htmlContent
                         end
                     end)
             else
                 if not isHidden then
-                    displayContentInWebPopup(adPosX, adPosY, 320, 50, event.htmlContent)
+                    displayContentInWebPopup(adPosX, adPosY, event.htmlContent)
                 else
                     currentWebPopupContent = event.htmlContent
                 end
@@ -301,14 +303,14 @@ local function adResponseCallback(event)
                 if animationEnabled and currentBanner then        
                     hideCurrentBannerWithAnimation(function()
                             if not isHidden then
-                                displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                                displayContentInWebPopup(adPosX, adPosY, contentHtml)
                             else
                                 currentWebPopupContent = contentHtml
                             end
                         end)
                 else
                     if not isHidden then
-                        displayContentInWebPopup(adPosX, adPosY, 320, 50, contentHtml)
+                        displayContentInWebPopup(adPosX, adPosY, contentHtml)
                     else
                         currentWebPopupContent = contentHtml
                     end
@@ -415,7 +417,7 @@ function AdMediator.show()
     if isHidden then
     
         if networks[currentNetworkIdx].usesWebPopup and currentWebPopupContent then
-            displayContentInWebPopup(adPosX, adPosY, 320, 50, currentWebPopupContent)
+            displayContentInWebPopup(adPosX, adPosY, currentWebPopupContent)
         end
     
         if timerHandle then
