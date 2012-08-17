@@ -19,7 +19,9 @@ local tapitNetwork
 local testModeInput
 local zoneIdInput
 local requestAdButton
-local requestTapitAlert
+local requestTapitAlertButton
+local requestInterstitialButton
+local interstitialsWindowGroup
 local alertLabel
 local adMediatorStarted = false
 local testMode = false
@@ -101,6 +103,41 @@ local function startAdMediator()
 
 end
 
+local function closeInterstitialsWindow()
+    interstitialsWindowGroup:removeSelf()
+end
+
+local function setupInterstitialsWindow()
+
+    interstitialsWindowGroup = display.newGroup()
+
+    local maskBg = display.newRect(0, 0, 320, 480)
+    maskBg:setFillColor(0, 0, 0, 240)
+    maskBg:addEventListener("touch",function() return true end)
+
+    local closeButton = widget.newButton{
+        label = "Close Ads",
+        left = (320-200)/2,
+        top = 270,
+        width = 200, height = 40,
+        onRelease = function()
+            
+            closeInterstitialsWindow()
+
+            -- call this function to remove native interstitials display window
+            tapitNetwork:closeInterstitialAds()
+
+            -- we should call this to resume ad processing
+            AdMediator.resume()
+
+        end
+    }
+
+    interstitialsWindowGroup:insert(maskBg)
+    interstitialsWindowGroup:insert(closeButton.view)
+
+end
+
 -- this function creates gui for our applicaton
 local function initGui()
 
@@ -119,6 +156,8 @@ local function initGui()
             if requestAdButton.disabled then                
                 alertLabel.text = "restart application to modify parameters"
                 return
+            else
+                alertLabel.text = ""
             end
 
             startAdMediator()
@@ -127,10 +166,13 @@ local function initGui()
             requestAdButton.disabled = true
             requestAdButton.alpha = 0.5
 
+            requestInterstitialButton.alpha = 1.0
+            requestTapitAlertButton.alpha = 1.0
+
         end
     }
 
-    requestTapitAlert = widget.newButton{
+    requestTapitAlertButton = widget.newButton{
         label = "Request Alert Ads",
         left = (320-200)/2,
         top = 270,
@@ -144,6 +186,48 @@ local function initGui()
             end
         end
     }
+    requestTapitAlertButton.alpha = 0.5
+
+    requestInterstitialButton = widget.newButton{
+        label = "Request Interstitials",
+        left = (320-200)/2,
+        top = 320,
+        width = 200, height = 40,
+        onRelease = function()
+            if adMediatorStarted then
+                alertLabel.text = ""
+
+                --we should pause ad mediator before requesting interstitials!
+                AdMediator.pause()
+
+                --this function will be called by tapit plugin after receiving interstitials response from ad server.
+                --result can be "displaying", "notavailable" or "adclicked"
+                local function interstitialsCallbackFunction(result)
+                    
+                    if result == "displaying" then
+
+                        setupInterstitialsWindow()
+
+                    elseif result == "notavailable" then
+                        alertLabel.text = "interstitials not available this time!"
+
+                        AdMediator.resume()
+
+                    elseif result == "adclicked" then
+
+                        closeInterstitialsWindow()
+
+                    end
+                end
+
+                tapitNetwork:requestInterstitialAds(10,0,interstitialsCallbackFunction)
+
+            else
+                alertLabel.text = "please start ad mediator first"
+            end
+        end
+    }
+    requestInterstitialButton.alpha = 0.5
 
     local displayGroup = display.newGroup()
     createCaption(displayGroup, "Tapit Demo", 160, 100)

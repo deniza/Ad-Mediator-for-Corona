@@ -566,4 +566,12 @@ function AdMediator.start()
     
 end
 
+function AdMediator.pause()
+    timer.pause(timerHandle)
+end
+
+function AdMediator.resume()
+    timer.resume(timerHandle)
+end
+
 findClientIPAddress()
