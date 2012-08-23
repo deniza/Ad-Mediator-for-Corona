@@ -79,7 +79,8 @@ local function parse_query_string(query)
 end
 
 local function fixLink(link)
-    if string.find(link, "/aclk%?") then
+	local i = string.find(link, "/aclk%?")
+    if i==1 then
         link = string.gsub(link, "/aclk%?", adServerUrl.."/aclk?")
     end
     return link
