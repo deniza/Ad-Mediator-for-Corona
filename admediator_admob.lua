@@ -78,6 +78,14 @@ local function parse_query_string(query)
 	return parsed
 end
 
+local function fixLink(link)
+	local i = string.find(link, "/aclk%?")
+    if i==1 then
+        link = string.gsub(link, "/aclk%?", adServerUrl.."/aclk?")
+    end
+    return link
+end
+
 local function webPopupListener( event )            
         
     if string.find(event.url, "file://",1,true) then        
@@ -100,7 +108,8 @@ local function webPopupListener( event )
 
             if prevOpenUrl ~= link then
             
-                timer.performWithDelay(10,function()                
+                timer.performWithDelay(10,function()
+                    link = fixLink(link)
                     system.openURL(link)
                     native.cancelWebPopup()
                 end)
