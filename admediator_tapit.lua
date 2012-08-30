@@ -27,7 +27,7 @@ local udid_hashed = ""   --not used
 local testMode
 local testZoneId = 3644
 local enableAlertAds
-local operationMode = ""
+local operationMode = nil
 local swapAlertButtons
 local userAgentEncoded
 local metaTag = AdMediator.viewportMetaTagForPlatform()
@@ -143,7 +143,7 @@ local function adRequestListener(event)
     local htmlContent = ""
     local interstitialDisplayed = false
 
-    print("response:",event.response)
+    --print("response:",event.response)
 
     if event.isError or event.response == "" then        
         available = false
@@ -292,23 +292,17 @@ function instance:requestAd()
         ua = userAgentEncoded,
         udid = udid_hashed,
         format = "json",
-        carrier = "unknown",
         connection_speed = 1,
         plugin = "corona-" .. pluginProtocolVersion,
-        mode = operationMode,
     }
+
+    if operationMode then
+        reqParams["mode"] = operationMode
+    end
 
     if currentAdType == adTypeAlert or currentAdType == adTypeInterstitial then
         reqParams["adtype"] = currentAdType
     end
-
-    if platform == AdMediator.PLATFORM_ANDROID then
-        reqParams["sdk"] = "android-v1.7.1"
-    else
-        reqParams["client"] = "iOS-SDK"
-        reqParams["version"] = "2.0.0"
-    end
-
 
     local requestUri = "http://r.tapit.com/adrequest.php?"
 
