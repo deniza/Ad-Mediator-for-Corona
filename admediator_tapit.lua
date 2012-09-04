@@ -23,7 +23,6 @@ local interstitialAdState_displaying = 2
 local platform = AdMediator.getPlatform()
 local pluginProtocolVersion = "1.0"
 local zoneId
-local udid_hashed = ""   --not used
 local testMode
 local testZoneId = 3644
 local enableAlertAds
@@ -290,7 +289,6 @@ function instance:requestAd()
     local reqParams = {
         zone = activeZoneId,
         ua = userAgentEncoded,
-        udid = udid_hashed,
         format = "json",
         connection_speed = 1,
         plugin = "corona-" .. pluginProtocolVersion,
