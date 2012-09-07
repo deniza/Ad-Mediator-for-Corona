@@ -135,9 +135,6 @@ local function local_configuration()
     
 
     -- to receive LIVE ads, set zoneId to your tapit zoneId and disable test mode
-    -- set enableAlertAds to receive alert ads (by calling tapit:requestAlertAds())
-    -- set swapButtons=true to swap alert ads confirmation buttons.
-    -- tapit plugin also supports interstitial ads. please check main-tapitdemo.lua for further instructions.
     local tapit = AdMediator.addNetwork(
         {
             name="admediator_tapit",
@@ -147,8 +144,6 @@ local function local_configuration()
             networkParams = {
                 zoneId="7527",
                 test=true,
-                enableAlertAds=false,
-                swapButtons=false,
             },
         }
     )
