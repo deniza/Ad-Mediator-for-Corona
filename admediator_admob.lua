@@ -115,6 +115,8 @@ local function webPopupListener( event )
                 end)
                 
                 prevOpenUrl = link
+            else
+                prevOpenUrl = nil
             end
             
         end            
@@ -128,11 +130,15 @@ local function webPopupListener( event )
             return true
         end
     
-        timer.performWithDelay(10,function()
-           system.openURL(event.url)
-            native.cancelWebPopup()
-        end)
-        return true
+        if prevOpenUrl ~= event.url then    
+            timer.performWithDelay(10,function()
+               system.openURL(event.url)
+                native.cancelWebPopup()
+            end)
+            prevOpenUrl = event.url
+        else
+            prevOpenUrl = nil
+        end
     else
     
         print("unknown protocol scheme", event.url)
